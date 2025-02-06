@@ -63,7 +63,9 @@ class RoutineWidget(HorizontalGroup):
         yield Label(
             self.r_name, id=f"{self.r_name}-routine", classes="routine-name"
         )
-        yield VerticalScroll(id=f"{self.r_name}-exercises")
+        yield VerticalScroll(
+            id=f"{self.r_name}-exercises", classes="exercises-scroll"
+        )
 
     def on_mount(self) -> None:
         exercise_container = self.query_one(f"#{self.r_name}-exercises")

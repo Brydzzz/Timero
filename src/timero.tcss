@@ -1,6 +1,5 @@
 Screen {
     align: center middle;
-    height: 100vh;
 }
 
 #start-btns {
@@ -27,7 +26,17 @@ Label {
     margin: 1;
 }
 
+ExerciseWidget {
+    background: $boost;
+}
+
 .routine-name{
     background: $accent;
     text-style: underline bold;
+    margin: 2 1;
+}
+
+.exercises-scroll {
+    margin-bottom: 4;
+    height: auto;
 }
