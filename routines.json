@@ -1,0 +1,29 @@
+[
+  {
+    "__type__": "Routine",
+    "name": "Morning Workout",
+    "exercises": [
+      {
+        "__type__": "DurationExercise",
+        "name": "Plank",
+        "duration": 60
+      },
+      {
+        "__type__": "RepetitionExercise",
+        "name": "Push-ups",
+        "repetitions": 15
+      }
+    ]
+  },
+  {
+    "__type__": "Routine",
+    "name": "Evening Routine",
+    "exercises": [
+      {
+        "__type__": "RepetitionExercise",
+        "name": "Jump Rope",
+        "repetitions": 30
+      }
+    ]
+  }
+]
