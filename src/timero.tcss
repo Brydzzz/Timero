@@ -1,5 +1,6 @@
 Screen {
     align: center middle;
+    height: 100vh;
 }
 
 #start-btns {
@@ -10,4 +11,23 @@ Button {
     margin: 1 2;
     width: 18;
     height: 3;
+}
+
+RoutineScreen {
+    layout: vertical;
+}
+
+RoutineWidget {
+    layout: vertical;
+    margin: 4;
+    background: $boost;
+}
+
+Label {
+    margin: 1;
+}
+
+.routine-name{
+    background: $accent;
+    text-style: underline bold;
 }

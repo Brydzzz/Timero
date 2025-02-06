@@ -1,7 +1,12 @@
+from pathlib import Path
 from textual.app import App, ComposeResult
-from textual.containers import HorizontalGroup, VerticalScroll
+from textual.containers import (
+    HorizontalGroup,
+    VerticalScroll,
+    HorizontalScroll,
+)
 from textual.screen import Screen
-from textual.reactive import reactive
+from textual.reactive import reactive, var
 from textual.widgets import Button, Footer, Header, Label, Static
 
 from routine import (
@@ -55,15 +60,19 @@ class RoutineWidget(HorizontalGroup):
         self.exercises = exercises
 
     def compose(self) -> ComposeResult:
-        yield HorizontalGroup(
-            Label(self.r_name, id="routine-name"), id=f"{self.r_name}-routine"
+        yield Label(
+            self.r_name, id=f"{self.r_name}-routine", classes="routine-name"
         )
+        yield VerticalScroll(id=f"{self.r_name}-exercises")
+
+    def on_mount(self) -> None:
+        exercise_container = self.query_one(f"#{self.r_name}-exercises")
         for e in self.exercises:
             if isinstance(e, DurationExercise):
                 new_exercise = DurationExerciseWidget(e.name, e.duration)
             elif isinstance(e, RepetitionExercise):
                 new_exercise = RepetitionExerciseWidget(e.name, e.repetitions)
-            self.mount(new_exercise)
+            exercise_container.mount(new_exercise)
 
 
 class RoutinesScreen(Screen):
@@ -73,7 +82,7 @@ class RoutinesScreen(Screen):
         """Create child widgets for the app."""
         yield Header()
         yield Footer()
-        yield VerticalScroll(id="routines")
+        yield HorizontalScroll(id="routines")
 
     def on_mount(self) -> None:
         routines_container = self.query_one("#routines")
@@ -111,7 +120,8 @@ class StartScreen(Screen):
             pass
 
     def action_load_routine(self) -> None:
-        self.app.routines = load_routines("routines.json")
+
+        self.app.routines = load_routines(self.app.path)
         self.log(f"Routines {self.app.routines}")
         self.app.install_screen(RoutinesScreen(), name="routines")
         self.app.switch_screen("routines")
@@ -126,6 +136,7 @@ class TimeroApp(App):
     ]
 
     routines: list[Routine] = reactive(None)
+    path = var(Path(__file__).parent.parent / "routines.json")
 
     def compose(self) -> ComposeResult:
         """Create child widgets for the app."""

@@ -25,5 +25,27 @@
         "repetitions": 30
       }
     ]
+  },
+  {
+    "__type__": "Routine",
+    "name": "Friday Routine",
+    "exercises": [
+      {
+        "__type__": "RepetitionExercise",
+        "name": "Jump Rope",
+        "repetitions": 30
+      }
+    ]
+  },
+  {
+    "__type__": "Routine",
+    "name": "Monday Routine",
+    "exercises": [
+      {
+        "__type__": "RepetitionExercise",
+        "name": "Jump Rope",
+        "repetitions": 30
+      }
+    ]
   }
 ]
