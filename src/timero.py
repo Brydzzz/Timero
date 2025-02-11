@@ -66,6 +66,11 @@ class RepetitionExerciseWidget(ExerciseWidget):
 class RoutineWidget(HorizontalGroup):
     """A routine widget."""
 
+    BINDINGS = [
+        ("a", "add_exercise", "Add Exercise"),
+        ("r", "remove_exercise", "Remove Exercise"),
+    ]
+
     def __init__(
         self, r_name: str, exercises: list[Exercise], *args, **kwargs
     ):
@@ -74,8 +79,18 @@ class RoutineWidget(HorizontalGroup):
         self.exercises = exercises
 
     def compose(self) -> ComposeResult:
-        yield Label(
-            self.r_name, id=f"{self.r_name}-routine", classes="routine-name"
+        yield HorizontalGroup(
+            Label(
+                self.r_name,
+                id=f"{self.r_name}-routine",
+                classes="routine-name",
+            ),
+            HorizontalGroup(
+                Button("Start", id="start-btn"),
+                Button("Edit", id="edit-btn"),
+                classes="routine-actions",
+            ),
+            classes="routine-header",
         )
         yield VerticalScroll(
             *[self._create_exercise_widget(e) for e in self.exercises],
@@ -88,6 +103,12 @@ class RoutineWidget(HorizontalGroup):
             return DurationExerciseWidget(e.name, e.duration)
         elif isinstance(e, RepetitionExercise):
             return RepetitionExerciseWidget(e.name, e.repetitions)
+
+    def action_add_exercise():
+        pass
+
+    def action_remove_exercise():
+        pass
 
 
 class RoutineScreen(Screen):

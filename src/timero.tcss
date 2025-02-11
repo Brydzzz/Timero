@@ -34,7 +34,7 @@ ExerciseWidget {
     dock: right;
 }
 
-# Routine
+# Routine Select
 RoutinesSelectScreen {
     align: center middle;
 }
@@ -52,6 +52,8 @@ RoutinesSelectScreen {
     border-title-style: bold;
 }
 
+
+# Routine View
 RoutineScreen {
     align: center top;
 }
@@ -64,11 +66,19 @@ RoutineWidget {
     height: 90vh;
 }
 
-.routine-name{
+.routine-name {
     background: $primary;
     text-style: underline bold;
     margin: 2 2 2 3;
-    text-align: center;
+    align-horizontal: left;
+}
+
+.routine-actions {
+    align-horizontal: right;
+}
+
+#start-btn {
+    background: $success-muted;
 }
 
 .exercises-scroll {
