@@ -120,12 +120,13 @@ class RoutinesSelectScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Header()
         yield Footer()
-        yield Label("Select Routine")
         items = (
             ListItem(Label(r.name), name=str(idx))
             for idx, r in enumerate(self.app.routines)
         )
-        yield ListView(*items)
+        lv = ListView(*items, classes="routines-list")
+        lv.border_title = "Select Routine: "
+        yield lv
 
     def on_list_view_selected(self, event: ListView.Selected) -> None:
         """Event handler called when list item is selected."""

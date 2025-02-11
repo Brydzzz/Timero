@@ -35,6 +35,23 @@ ExerciseWidget {
 }
 
 # Routine
+RoutinesSelectScreen {
+    align: center middle;
+}
+
+#select-routine {
+    text-style: bold;
+    border: solid $accent;
+}
+
+.routines-list {
+    max-width: 60vw;
+    height: auto;
+    border: solid $accent;
+    border-title-align: left;
+    border-title-style: bold;
+}
+
 RoutineScreen {
     align: center top;
 }
