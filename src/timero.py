@@ -23,6 +23,7 @@ from routine import (
     Routine,
     load_routines,
 )
+from utils import repetitions_to_str, seconds_to_time_str
 
 
 class ExerciseWidget(HorizontalGroup):
@@ -34,7 +35,7 @@ class ExerciseWidget(HorizontalGroup):
 
     def compose(self) -> ComposeResult:
         yield HorizontalGroup(
-            Label(self.e_name, id="exercise-name"),
+            Label(self.e_name, classes="exercise-name"),
         )
 
 
@@ -44,7 +45,10 @@ class DurationExerciseWidget(ExerciseWidget):
         self.duration = duration
 
     def compose(self) -> ComposeResult:
-        yield HorizontalGroup(Label(self.e_name), Label(str(self.duration)))
+        yield HorizontalGroup(
+            Label(self.e_name),
+            Label(seconds_to_time_str(self.duration), classes="duration"),
+        )
 
 
 class RepetitionExerciseWidget(ExerciseWidget):
@@ -53,7 +57,10 @@ class RepetitionExerciseWidget(ExerciseWidget):
         self.repetitions = repetitions
 
     def compose(self) -> ComposeResult:
-        yield HorizontalGroup(Label(self.e_name), Label(str(self.repetitions)))
+        yield HorizontalGroup(
+            Label(self.e_name),
+            Label(repetitions_to_str(self.repetitions), classes="repetitions"),
+        )
 
 
 class RoutineWidget(HorizontalGroup):

@@ -1,4 +1,17 @@
-Screen {
+# General
+Button {
+    margin: 1 2;
+    width: 18;
+    height: 3;
+}
+
+Label {
+    margin: 1;
+}
+
+
+# Start Screen
+StartScreen {
     align: center middle;
 }
 
@@ -6,37 +19,40 @@ Screen {
     align: center middle;
 }
 
-Button {
-    margin: 1 2;
-    width: 18;
-    height: 3;
+
+# Exercise
+ExerciseWidget {
+    background: $boost;
+    margin: 1 0;
 }
 
+.exercise-name {
+    dock: left;
+}
+
+.duration, .repetitions {
+    dock: right;
+}
+
+# Routine
 RoutineScreen {
-    layout: vertical;
+    align: center top;
 }
 
 RoutineWidget {
     layout: vertical;
-    margin: 4;
+    margin: 2 4 0 4;
     background: $boost;
-}
-
-Label {
-    margin: 1;
-}
-
-ExerciseWidget {
-    background: $boost;
+    max-width: 50vw;
 }
 
 .routine-name{
-    background: $accent;
+    background: $primary;
     text-style: underline bold;
-    margin: 2 1;
+    margin: 2;
 }
 
 .exercises-scroll {
-    margin-bottom: 4;
+    margin: 2 2;
     height: auto;
 }
