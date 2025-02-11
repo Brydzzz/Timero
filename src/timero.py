@@ -14,6 +14,8 @@ from textual.widgets import (
     Static,
     ListView,
     ListItem,
+    Input,
+    Select,
 )
 
 from routine import (
@@ -61,6 +63,17 @@ class RepetitionExerciseWidget(ExerciseWidget):
             Label(self.e_name),
             Label(repetitions_to_str(self.repetitions), classes="repetitions"),
         )
+
+
+class ExerciseInputWidget(HorizontalGroup):
+    def compose(self) -> ComposeResult:
+        yield Input(placeholder="Exercise Name")
+        options = [("Duration Exercise", 1), ("Repetition Exercise", 2)]
+        e_type: Select[int] = Select(
+            options, prompt="Select Exercise Type", allow_blank=False, value=1
+        )
+        yield e_type
+        yield Input("Duration", type="integer", restrict="^\\d+$")
 
 
 class RoutineWidget(HorizontalGroup):
@@ -131,7 +144,7 @@ class RoutineScreen(Screen):
         )
 
     def action_go_back(self) -> None:
-        self.app.switch_screen("select-routine")
+        self.app.switch_screen(RoutinesSelectScreen())
 
 
 class RoutinesSelectScreen(Screen):
@@ -151,7 +164,7 @@ class RoutinesSelectScreen(Screen):
     def on_list_view_selected(self, event: ListView.Selected) -> None:
         """Event handler called when list item is selected."""
         idx = int(event.item.name)
-        self.app.push_screen(RoutineScreen(r_idx=idx))
+        self.app.switch_screen(RoutineScreen(r_idx=idx))
 
 
 class StartScreen(Screen):
@@ -182,8 +195,7 @@ class StartScreen(Screen):
     def action_load_routine(self) -> None:
         self.app.routines = load_routines(self.app.path)
         self.log(f"Routines {self.app.routines}")
-        self.app.install_screen(RoutinesSelectScreen(), name="select-routine")
-        self.app.switch_screen("select-routine")
+        self.app.switch_screen(RoutinesSelectScreen())
 
 
 class TimeroApp(App):
