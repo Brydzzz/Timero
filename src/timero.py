@@ -137,8 +137,8 @@ class StartScreen(Screen):
     """Start screen for the app"""
 
     BINDINGS = [
-        ("l", "load_routine", "Load routine"),
-        ("c", "create_routine", "Create routine"),
+        ("l", "load_routine", "Load routines"),
+        ("c", "create_routine", "Create new routine"),
     ]
 
     def compose(self) -> ComposeResult:
@@ -169,6 +169,7 @@ class TimeroApp(App):
     """A Textual app to manage stopwatches."""
 
     CSS_PATH = "timero.tcss"
+    BINDINGS = [("h", "go_home", "Go to homepage")]
 
     routines: list[Routine] = reactive(None)
     path = var(Path(__file__).parent.parent / "routines.json")
@@ -183,6 +184,9 @@ class TimeroApp(App):
         self.install_screen(StartScreen(id="start"), name="start")
         self.push_screen("start")
         self.theme = "dracula"
+
+    def action_go_home(self) -> None:
+        self.app.switch_screen("start")
 
 
 if __name__ == "__main__":
