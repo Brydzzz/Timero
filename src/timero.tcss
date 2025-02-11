@@ -9,6 +9,14 @@ Label {
     margin: 1;
 }
 
+Input {
+    margin: 1;
+}
+
+Select {
+    margin: 1;
+}
+
 
 # Start Screen
 StartScreen {
@@ -79,6 +87,26 @@ RoutineWidget {
 
 #start-btn {
     background: $success-muted;
+}
+
+.hide {
+    display: none;
+}
+
+ExerciseInputWidget {
+    layout: vertical;
+}
+
+ExerciseInputWidget > Select {
+    border: solid $accent;
+    border-title-align: left;
+    border-title-style: bold;
+}
+
+ExerciseInputWidget > TimeMaskedInput {
+    border: solid $accent;
+    border-title-align: left;
+    border-title-style: bold;
 }
 
 .exercises-scroll {
