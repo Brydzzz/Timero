@@ -3,11 +3,18 @@ from textual.app import App, ComposeResult
 from textual.containers import (
     HorizontalGroup,
     VerticalScroll,
-    HorizontalScroll,
 )
 from textual.screen import Screen
 from textual.reactive import reactive, var
-from textual.widgets import Button, Footer, Header, Label, Static
+from textual.widgets import (
+    Button,
+    Footer,
+    Header,
+    Label,
+    Static,
+    ListView,
+    ListItem,
+)
 
 from routine import (
     DurationExercise,
@@ -77,22 +84,46 @@ class RoutineWidget(HorizontalGroup):
             exercise_container.mount(new_exercise)
 
 
-class RoutinesScreen(Screen):
+class RoutineScreen(Screen):
+    """Screen with selected routine"""
+
+    BINDINGS = [("b", "go_back", "Go back to select routine")]
+
+    def __init__(self, r_idx: int, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.routine_idx = r_idx
+        self.routine = self.app.routines[r_idx]
+
+    def compose(self):
+        yield Header()
+        yield Footer()
+        yield (
+            RoutineWidget(
+                r_name=self.routine.name, exercises=self.routine.exercises
+            )
+        )
+
+    def action_go_back(self) -> None:
+        self.app.switch_screen("select-routine")
+
+
+class RoutinesSelectScreen(Screen):
     """Screen with all routines"""
 
     def compose(self) -> ComposeResult:
-        """Create child widgets for the app."""
         yield Header()
         yield Footer()
-        yield HorizontalScroll(id="routines")
+        yield Label("Select Routine")
+        items = (
+            ListItem(Label(r.name), name=str(idx))
+            for idx, r in enumerate(self.app.routines)
+        )
+        yield ListView(*items)
 
-    def on_mount(self) -> None:
-        routines_container = self.query_one("#routines")
-
-        for routine in self.app.routines:
-            new_routine = RoutineWidget(routine.name, routine.exercises)
-            routines_container.mount(new_routine)
-            new_routine.scroll_visible()
+    def on_list_view_selected(self, event: ListView.Selected) -> None:
+        """Event handler called when list item is selected."""
+        idx = int(event.item.name)
+        self.app.push_screen(RoutineScreen(r_idx=idx))
 
 
 class StartScreen(Screen):
@@ -104,7 +135,6 @@ class StartScreen(Screen):
     ]
 
     def compose(self) -> ComposeResult:
-        """Create child widgets for the app."""
         yield Header()
         yield Footer()
         yield HorizontalGroup(
@@ -122,20 +152,16 @@ class StartScreen(Screen):
             pass
 
     def action_load_routine(self) -> None:
-
         self.app.routines = load_routines(self.app.path)
         self.log(f"Routines {self.app.routines}")
-        self.app.install_screen(RoutinesScreen(), name="routines")
-        self.app.switch_screen("routines")
+        self.app.install_screen(RoutinesSelectScreen(), name="select-routine")
+        self.app.switch_screen("select-routine")
 
 
 class TimeroApp(App):
     """A Textual app to manage stopwatches."""
 
     CSS_PATH = "timero.tcss"
-    BINDINGS = [
-        ("d", "toggle_dark", "Toggle dark mode"),
-    ]
 
     routines: list[Routine] = reactive(None)
     path = var(Path(__file__).parent.parent / "routines.json")
@@ -149,14 +175,7 @@ class TimeroApp(App):
     def on_mount(self) -> None:
         self.install_screen(StartScreen(id="start"), name="start")
         self.push_screen("start")
-
-    def action_toggle_dark(self) -> None:
-        """An action to toggle dark mode."""
-        self.theme = (
-            "textual-dark"
-            if self.theme == "textual-light"
-            else "textual-light"
-        )
+        self.theme = "dracula"
 
 
 if __name__ == "__main__":
