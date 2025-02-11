@@ -1,51 +1,226 @@
 [
-  {
-    "__type__": "Routine",
-    "name": "Morning Workout",
-    "exercises": [
-      {
-        "__type__": "DurationExercise",
-        "name": "Plank",
-        "duration": 60
-      },
-      {
-        "__type__": "RepetitionExercise",
-        "name": "Push-ups",
-        "repetitions": 15
-      }
-    ]
-  },
-  {
-    "__type__": "Routine",
-    "name": "Evening Routine",
-    "exercises": [
-      {
-        "__type__": "RepetitionExercise",
-        "name": "Jump Rope",
-        "repetitions": 30
-      }
-    ]
-  },
-  {
-    "__type__": "Routine",
-    "name": "Friday Routine",
-    "exercises": [
-      {
-        "__type__": "RepetitionExercise",
-        "name": "Jump Rope",
-        "repetitions": 30
-      }
-    ]
-  },
-  {
-    "__type__": "Routine",
-    "name": "Monday Routine",
-    "exercises": [
-      {
-        "__type__": "RepetitionExercise",
-        "name": "Jump Rope",
-        "repetitions": 30
-      }
-    ]
-  }
-]
+    {
+      "__type__": "Routine",
+      "name": "Morning Workout",
+      "exercises": [
+        {
+          "__type__": "DurationExercise",
+          "name": "Plank",
+          "duration": 60
+        },
+        {
+          "__type__": "RepetitionExercise",
+          "name": "Push-ups",
+          "repetitions": 15
+        },
+        {
+          "__type__": "RepetitionExercise",
+          "name": "Squats",
+          "repetitions": 20
+        },
+        {
+          "__type__": "RepetitionExercise",
+          "name": "Lunges",
+          "repetitions": 15
+        },
+        {
+          "__type__": "RepetitionExercise",
+          "name": "Bicycle Crunches",
+          "repetitions": 20
+        },
+        {
+          "__type__": "DurationExercise",
+          "name": "Mountain Climbers",
+          "duration": 30
+        },
+        {
+          "__type__": "RepetitionExercise",
+          "name": "Burpees",
+          "repetitions": 10
+        },
+        {
+          "__type__": "RepetitionExercise",
+          "name": "Glute Bridges",
+          "repetitions": 15
+        },
+        {
+          "__type__": "RepetitionExercise",
+          "name": "Tricep Dips",
+          "repetitions": 15
+        },
+        {
+          "__type__": "DurationExercise",
+          "name": "High Knees",
+          "duration": 30
+        }
+      ]
+    },
+    {
+      "__type__": "Routine",
+      "name": "Evening Routine",
+      "exercises": [
+        {
+          "__type__": "RepetitionExercise",
+          "name": "Jump Rope",
+          "repetitions": 30
+        },
+        {
+          "__type__": "RepetitionExercise",
+          "name": "Jumping Jacks",
+          "repetitions": 50
+        },
+        {
+          "__type__": "RepetitionExercise",
+          "name": "Leg Raises",
+          "repetitions": 15
+        },
+        {
+          "__type__": "RepetitionExercise",
+          "name": "Russian Twists",
+          "repetitions": 20
+        },
+        {
+          "__type__": "DurationExercise",
+          "name": "Side Plank",
+          "duration": 30
+        },
+        {
+          "__type__": "RepetitionExercise",
+          "name": "Calf Raises",
+          "repetitions": 20
+        },
+        {
+          "__type__": "DurationExercise",
+          "name": "Arm Circles",
+          "duration": 30
+        },
+        {
+          "__type__": "DurationExercise",
+          "name": "Wall Sits",
+          "duration": 60
+        },
+        {
+          "__type__": "RepetitionExercise",
+          "name": "Reverse Crunches",
+          "repetitions": 15
+        },
+        {
+          "__type__": "DurationExercise",
+          "name": "Plank Jacks",
+          "duration": 30
+        }
+      ]
+    },
+    {
+      "__type__": "Routine",
+      "name": "Friday Routine",
+      "exercises": [
+        {
+          "__type__": "RepetitionExercise",
+          "name": "Jump Rope",
+          "repetitions": 30
+        },
+        {
+          "__type__": "RepetitionExercise",
+          "name": "Squat Jumps",
+          "repetitions": 15
+        },
+        {
+          "__type__": "RepetitionExercise",
+          "name": "Walking Lunges",
+          "repetitions": 20
+        },
+        {
+          "__type__": "RepetitionExercise",
+          "name": "Burpees",
+          "repetitions": 10
+        },
+        {
+          "__type__": "RepetitionExercise",
+          "name": "Push-ups",
+          "repetitions": 15
+        },
+        {
+          "__type__": "RepetitionExercise",
+          "name": "Bicycle Crunches",
+          "repetitions": 20
+        },
+        {
+          "__type__": "DurationExercise",
+          "name": "Mountain Climbers",
+          "duration": 30
+        },
+        {
+          "__type__": "RepetitionExercise",
+          "name": "Glute Bridges",
+          "repetitions": 15
+        },
+        {
+          "__type__": "RepetitionExercise",
+          "name": "Tricep Dips",
+          "repetitions": 15
+        },
+        {
+          "__type__": "DurationExercise",
+          "name": "High Knees",
+          "duration": 30
+        }
+      ]
+    },
+    {
+      "__type__": "Routine",
+      "name": "Monday Routine",
+      "exercises": [
+        {
+          "__type__": "RepetitionExercise",
+          "name": "Jump Rope",
+          "repetitions": 30
+        },
+        {
+          "__type__": "RepetitionExercise",
+          "name": "Jumping Jacks",
+          "repetitions": 50
+        },
+        {
+          "__type__": "RepetitionExercise",
+          "name": "Leg Raises",
+          "repetitions": 15
+        },
+        {
+          "__type__": "RepetitionExercise",
+          "name": "Russian Twists",
+          "repetitions": 20
+        },
+        {
+          "__type__": "DurationExercise",
+          "name": "Side Plank",
+          "duration": 30
+        },
+        {
+          "__type__": "RepetitionExercise",
+          "name": "Calf Raises",
+          "repetitions": 20
+        },
+        {
+          "__type__": "DurationExercise",
+          "name": "Arm Circles",
+          "duration": 30
+        },
+        {
+          "__type__": "DurationExercise",
+          "name": "Wall Sits",
+          "duration": 60
+        },
+        {
+          "__type__": "RepetitionExercise",
+          "name": "Reverse Crunches",
+          "repetitions": 15
+        },
+        {
+          "__type__": "DurationExercise",
+          "name": "Plank Jacks",
+          "duration": 30
+        }
+      ]
+    }
+  ]
