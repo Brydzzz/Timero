@@ -23,7 +23,7 @@ StartScreen {
 # Exercise
 ExerciseWidget {
     background: $boost;
-    margin: 1 0;
+    margin: 1 1;
 }
 
 .exercise-name {
@@ -58,18 +58,19 @@ RoutineScreen {
 
 RoutineWidget {
     layout: vertical;
-    margin: 2 4 0 4;
+    margin: 1 4 1 4;
     background: $boost;
     max-width: 50vw;
+    height: 90vh;
 }
 
 .routine-name{
     background: $primary;
     text-style: underline bold;
-    margin: 2;
+    margin: 2 2 2 3;
+    text-align: center;
 }
 
 .exercises-scroll {
-    margin: 2 2;
-    height: auto;
+    margin: 0 2 2 2;
 }

@@ -78,17 +78,16 @@ class RoutineWidget(HorizontalGroup):
             self.r_name, id=f"{self.r_name}-routine", classes="routine-name"
         )
         yield VerticalScroll(
-            id=f"{self.r_name}-exercises", classes="exercises-scroll"
+            *[self._create_exercise_widget(e) for e in self.exercises],
+            id=f"{self.r_name}-exercises",
+            classes="exercises-scroll",
         )
 
-    def on_mount(self) -> None:
-        exercise_container = self.query_one(f"#{self.r_name}-exercises")
-        for e in self.exercises:
-            if isinstance(e, DurationExercise):
-                new_exercise = DurationExerciseWidget(e.name, e.duration)
-            elif isinstance(e, RepetitionExercise):
-                new_exercise = RepetitionExerciseWidget(e.name, e.repetitions)
-            exercise_container.mount(new_exercise)
+    def _create_exercise_widget(self, e: Exercise) -> ExerciseWidget:
+        if isinstance(e, DurationExercise):
+            return DurationExerciseWidget(e.name, e.duration)
+        elif isinstance(e, RepetitionExercise):
+            return RepetitionExerciseWidget(e.name, e.repetitions)
 
 
 class RoutineScreen(Screen):
