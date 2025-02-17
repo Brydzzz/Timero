@@ -243,7 +243,7 @@ class RoutineWidget(HorizontalGroup):
             ),
             HorizontalGroup(
                 Button("Start", id="start-btn"),
-                Button("Edit", id="edit-btn"),
+                Button("Reorder", id="reorder-btn"),
                 classes="routine-actions",
             ),
             classes="routine-header",
