@@ -155,7 +155,7 @@ class ExerciseInputWidget(HorizontalGroup):
         yield self.rep_input
         yield HorizontalGroup(
             Button("Add", id="add-btn"), Button("Cancel", id="cancel-btn")
-        )
+        )  # TODO: add edit button when updating exercise info
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         button_id = event.button.id
@@ -204,6 +204,7 @@ class RoutineWidget(HorizontalGroup):
     BINDINGS = [
         ("a", "add_exercise", "Add Exercise"),
         ("r", "remove_exercise", "Remove Exercise"),
+        ("e", "edit_exercise", "Edit Exercise"),
     ]
 
     def __init__(
@@ -218,6 +219,20 @@ class RoutineWidget(HorizontalGroup):
         self.r_idx = r_idx
         self.r_name = r_name.replace(" ", "-")
         self.exercises = exercises
+
+    def _show_exercise_form(
+        self,
+        name: str = "",
+        duration: str = "",
+        rep: str = "",
+        type: int = DURATION_OPTION,
+    ) -> None:
+        self.e_input.e_name.value = name
+        self.e_input.duration_input.value = duration
+        self.e_input.rep_input.value = rep
+        self.e_input.e_type.value = type
+        self.e_input.remove_class("hide")
+        self.e_input.e_name.focus()
 
     def compose(self) -> ComposeResult:
         yield HorizontalGroup(
@@ -242,11 +257,7 @@ class RoutineWidget(HorizontalGroup):
         yield self.e_list
 
     def action_add_exercise(self) -> None:
-        self.e_input.remove_class("hide")
-        self.e_input.e_name.value = ""
-        self.e_input.duration_input.value = ""
-        self.e_input.rep_input.value = ""
-        self.e_input.e_name.focus()
+        self._show_exercise_form()
 
     def action_remove_exercise(self) -> None:
         selected_item = self.e_list.highlighted_child
@@ -261,6 +272,26 @@ class RoutineWidget(HorizontalGroup):
         routine.exercises.pop(self.e_list.index)
 
         save_routines(self.app.path, self.app.routines)
+
+    def action_edit_exercise(self) -> None:
+        selected_item = self.e_list.highlighted_child
+
+        if selected_item is None or not self.e_list.has_focus:
+            # TODO: popup for user
+            return
+
+        routine: Routine = self.app.routines[self.r_idx]
+        e = routine.exercises[self.e_list.index]
+        if isinstance(e, DurationExercise):
+            self._show_exercise_form(
+                name=e.name,
+                duration=e.duration_mask_string(),
+                type=DURATION_OPTION,
+            )
+        elif isinstance(e, RepetitionExercise):
+            self._show_exercise_form(
+                name=e.name, rep=str(e.repetitions), type=REPETITION_OPTION
+            )
 
 
 class RoutineScreen(Screen):

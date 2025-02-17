@@ -11,6 +11,16 @@ class DurationExercise(Exercise):
         super().__init__(name)
         self.duration = duration
 
+    def duration_mask_string(self) -> str:
+        minutes, sec = divmod(self.duration, 60)
+        hours, minutes = divmod(minutes, 60)
+        parts = []
+        parts.append(f"{hours:02}")
+        parts.append(f"{minutes:02}")
+        parts.append(f"{sec:02}")
+
+        return ":".join(parts)
+
 
 class RepetitionExercise(Exercise):
     def __init__(self, name: str, repetitions: int):
