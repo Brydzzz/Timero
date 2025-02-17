@@ -18,7 +18,8 @@ from textual.widgets import (
     Select,
     MaskedInput,
 )
-# from textual import log
+
+from textual import log
 from textual.validation import Validator, ValidationResult
 
 from routine import (
@@ -27,16 +28,28 @@ from routine import (
     RepetitionExercise,
     Routine,
     load_routines,
+    save_routines,
 )
-from utils import repetitions_to_str, seconds_to_time_str
+from utils import (
+    duration_input_to_seconds,
+    repetitions_to_str,
+    seconds_to_time_str,
+)
+
+
+class IsEmptyValidator(Validator):
+    def validate(self, value: str) -> ValidationResult:
+        return (
+            self.success() if len(value) != 0 else self.failure("Empty Input")
+        )
 
 
 class TimeValidator(Validator):
     def validate(self, value: str) -> ValidationResult:
         cleaned = value.replace(":", "")
 
-        if not cleaned:
-            return self.success()
+        if len(cleaned) < 6:
+            return self.failure("Input too short")
 
         if len(cleaned) >= 4:
             minutes = int(cleaned[2:4])
@@ -94,24 +107,53 @@ class TimeMaskedInput(MaskedInput):
             {
                 "template": "99:99:99;0",
                 "placeholder": "HH:MM:SS",
-                "validators": [TimeValidator()],
+                "validators": [TimeValidator(), IsEmptyValidator()],
             }
         )
         super().__init__(*args, **kwargs)
 
 
+DURATION_OPTION = 1
+REPETITION_OPTION = 2
+
+
+def create_exercise_widget(e: Exercise) -> ExerciseWidget:
+    if isinstance(e, DurationExercise):
+        return DurationExerciseWidget(e.name, e.duration)
+    elif isinstance(e, RepetitionExercise):
+        return RepetitionExerciseWidget(e.name, e.repetitions)
+
+
 class ExerciseInputWidget(HorizontalGroup):
+
+    def _is_form_valid(self) -> bool:
+        if self.e_type.value == DURATION_OPTION:
+            return all([self.e_name.is_valid, self.duration_input.is_valid])
+        else:  # REPETITION_OPTION
+            return all([self.e_name.is_valid, self.rep_input.is_valid])
+
     def compose(self) -> ComposeResult:
-        yield Input(placeholder="Exercise Name")
-        options = [("Duration Exercise", 1), ("Repetition Exercise", 2)]
-        e_type: Select[int] = Select(options, allow_blank=False, value=1)
-        e_type.border_title = "Exercise Type"
-        yield e_type
+        self.e_name = Input(
+            placeholder="Exercise Name",
+            type="text",
+            validators=[IsEmptyValidator()],
+        )
+        yield self.e_name
+        options = [
+            ("Duration Exercise", DURATION_OPTION),
+            ("Repetition Exercise", REPETITION_OPTION),
+        ]
+        self.e_type: Select[int] = Select(options, allow_blank=False, value=1)
+        self.e_type.border_title = "Exercise Type"
+        yield self.e_type
         self.duration_input = TimeMaskedInput(classes="hide")
         self.duration_input.border_title = "Exercise Duration"
         yield self.duration_input
         self.rep_input = Input(
-            placeholder="No. of repetitions", type="integer", classes="hide"
+            placeholder="No. of repetitions",
+            type="integer",
+            classes="hide",
+            validators=[IsEmptyValidator()],
         )
         yield self.rep_input
         yield HorizontalGroup(
@@ -121,16 +163,40 @@ class ExerciseInputWidget(HorizontalGroup):
     def on_button_pressed(self, event: Button.Pressed) -> None:
         button_id = event.button.id
         if button_id == "add-btn":
+            if not self._is_form_valid():
+                log("Form not valid")
+                # TODO: show a popup for user
+                return
+
+            if self.e_type.value == DURATION_OPTION:
+                new_exercise = DurationExercise(
+                    self.e_name.value,
+                    duration_input_to_seconds(self.duration_input.value),
+                )
+            elif self.e_type.value == REPETITION_OPTION:
+                new_exercise = RepetitionExercise(
+                    self.e_name.value, int(self.rep_input.value)
+                )
+
+            parent = self.screen.query_one("#routine-widget", RoutineWidget)
+
+            new_widget = create_exercise_widget(new_exercise)
+            parent.query_one("#exercises-scroll").mount(new_widget)
+            new_widget.scroll_visible()
+
+            routine: Routine = self.app.routines[parent.r_idx]
+            routine.add_exercise(new_exercise)
+
+            save_routines(self.app.path, self.app.routines)
             self.add_class("hide")
-            # TODO: actually add the exercise
         if button_id == "cancel-btn":
             self.add_class("hide")
 
     def on_select_changed(self, event: Select.Changed) -> None:
-        if event.value == 1:
+        if event.value == DURATION_OPTION:
             self.duration_input.remove_class("hide")
             self.rep_input.add_class("hide")
-        elif event.value == 2:
+        elif event.value == REPETITION_OPTION:
             self.rep_input.remove_class("hide")
             self.duration_input.add_class("hide")
 
@@ -144,9 +210,15 @@ class RoutineWidget(HorizontalGroup):
     ]
 
     def __init__(
-        self, r_name: str, exercises: list[Exercise], *args, **kwargs
+        self,
+        r_idx: int,
+        r_name: str,
+        exercises: list[Exercise],
+        *args,
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
+        self.r_idx = r_idx
         self.r_name = r_name.replace(" ", "-")
         self.exercises = exercises
 
@@ -166,20 +238,18 @@ class RoutineWidget(HorizontalGroup):
         )
         self.e_input = ExerciseInputWidget(id="exercise-input", classes="hide")
         yield self.e_input
+        # TODO: change to ListView for easier selection for edit
         yield VerticalScroll(
-            *[self._create_exercise_widget(e) for e in self.exercises],
-            id=f"{self.r_name}-exercises",
-            classes="exercises-scroll",
+            *[create_exercise_widget(e) for e in self.exercises],
+            id="exercises-scroll",
         )
-
-    def _create_exercise_widget(self, e: Exercise) -> ExerciseWidget:
-        if isinstance(e, DurationExercise):
-            return DurationExerciseWidget(e.name, e.duration)
-        elif isinstance(e, RepetitionExercise):
-            return RepetitionExerciseWidget(e.name, e.repetitions)
 
     def action_add_exercise(self) -> None:
         self.e_input.remove_class("hide")
+        self.e_input.e_name.value = ""
+        self.e_input.duration_input.value = ""
+        self.e_input.rep_input.value = ""
+        self.e_input.e_name.focus()
 
     def action_remove_exercise():
         pass
@@ -200,7 +270,10 @@ class RoutineScreen(Screen):
         yield Footer()
         yield (
             RoutineWidget(
-                r_name=self.routine.name, exercises=self.routine.exercises
+                r_idx=self.routine_idx,
+                r_name=self.routine.name,
+                exercises=self.routine.exercises,
+                id="routine-widget",
             )
         )
 

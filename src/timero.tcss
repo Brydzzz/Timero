@@ -93,6 +93,10 @@ RoutineWidget {
     display: none;
 }
 
+#cancel-btn {
+    background: $error-muted;
+}
+
 ExerciseInputWidget {
     layout: vertical;
 }
@@ -107,8 +111,15 @@ ExerciseInputWidget > TimeMaskedInput {
     border: solid $accent;
     border-title-align: left;
     border-title-style: bold;
+
+    &.-invalid {
+        border: solid $error 60%;
+    }
+    &.-invalid:focus {
+        border: solid $error;
+    }
 }
 
-.exercises-scroll {
+#exercises-scroll {
     margin: 0 2 2 2;
 }
