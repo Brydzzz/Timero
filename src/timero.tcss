@@ -31,11 +31,13 @@ StartScreen {
 # Exercise
 ExerciseWidget {
     background: $boost;
+    border: tall $border;
     margin: 1 1;
 }
 
 .exercise-name {
     dock: left;
+    padding-left: 3;
 }
 
 .duration, .repetitions {
@@ -122,4 +124,43 @@ ExerciseInputWidget > TimeMaskedInput {
 
 #exercises-scroll {
     margin: 0 2 2 2;
+    background: $surface;
+
+    & > ListItem {
+        color: $foreground;
+        height: auto;
+        overflow: hidden hidden;
+        width: 1fr;
+
+        &.-hovered {
+            background: $block-hover-background;
+            & > ExerciseWidget {
+                background: transparent;
+            }
+        }
+
+        &.-highlight {
+            color: $block-cursor-blurred-foreground;
+            background: $block-cursor-blurred-background;
+            text-style: $block-cursor-blurred-text-style;
+            & > ExerciseWidget {
+                background: transparent;
+            }
+        }
+    }
+
+    &:focus {
+        background-tint: $foreground 5%;
+        & > ListItem {
+            &.-highlight {
+                color: $block-cursor-foreground;
+                background: $block-cursor-background;
+                text-style: $block-cursor-text-style;
+                & > ExerciseWidget {
+                    background: transparent;
+                }
+            }
+
+        }
+    }
 }

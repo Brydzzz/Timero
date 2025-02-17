@@ -1,9 +1,6 @@
 from pathlib import Path
 from textual.app import App, ComposeResult
-from textual.containers import (
-    HorizontalGroup,
-    VerticalScroll,
-)
+from textual.containers import HorizontalGroup
 from textual.screen import Screen
 from textual.reactive import reactive, var
 from textual.widgets import (
@@ -180,7 +177,7 @@ class ExerciseInputWidget(HorizontalGroup):
 
             parent = self.screen.query_one("#routine-widget", RoutineWidget)
 
-            new_widget = create_exercise_widget(new_exercise)
+            new_widget = ListItem(create_exercise_widget(new_exercise))
             parent.query_one("#exercises-scroll").mount(new_widget)
             new_widget.scroll_visible()
 
@@ -238,11 +235,11 @@ class RoutineWidget(HorizontalGroup):
         )
         self.e_input = ExerciseInputWidget(id="exercise-input", classes="hide")
         yield self.e_input
-        # TODO: change to ListView for easier selection for edit
-        yield VerticalScroll(
-            *[create_exercise_widget(e) for e in self.exercises],
+        self.e_list = ListView(
+            *[ListItem(create_exercise_widget(e)) for e in self.exercises],
             id="exercises-scroll",
         )
+        yield self.e_list
 
     def action_add_exercise(self) -> None:
         self.e_input.remove_class("hide")
@@ -251,8 +248,19 @@ class RoutineWidget(HorizontalGroup):
         self.e_input.rep_input.value = ""
         self.e_input.e_name.focus()
 
-    def action_remove_exercise():
-        pass
+    def action_remove_exercise(self) -> None:
+        selected_item = self.e_list.highlighted_child
+
+        if selected_item is None or not self.e_list.has_focus:
+            # TODO: popup for user
+            return
+
+        self.e_list.remove_children([selected_item])
+
+        routine: Routine = self.app.routines[self.r_idx]
+        routine.exercises.pop(self.e_list.index)
+
+        save_routines(self.app.path, self.app.routines)
 
 
 class RoutineScreen(Screen):
