@@ -36,6 +36,9 @@ class Routine:
     def add_exercise(self, exercise: Exercise):
         self.exercises.append(exercise)
 
+    def replace_exercise(self, new_exercise: Exercise, idx: int):
+        self.exercises[idx] = new_exercise
+
 
 class RoutineEncoder(json.JSONEncoder):
     def default(self, obj):

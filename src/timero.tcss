@@ -101,6 +101,25 @@ RoutineWidget {
 
 ExerciseInputWidget {
     layout: vertical;
+
+    & > HorizontalGroup #save-exercise-edit-btn {
+        display: none;
+    }
+
+    & > HorizontalGroup #add-btn {
+        display: block;
+    }
+
+    &.editing-exercise {
+
+        & > HorizontalGroup #save-exercise-edit-btn {
+            display: block;
+        }
+
+        & > HorizontalGroup #add-btn {
+            display: none;
+        }
+    }
 }
 
 ExerciseInputWidget > Select {

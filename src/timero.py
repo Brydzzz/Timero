@@ -129,6 +129,18 @@ class ExerciseInputWidget(HorizontalGroup):
         else:  # REPETITION_OPTION
             return all([self.e_name.is_valid, self.rep_input.is_valid])
 
+    def _create_exercise(self) -> None:
+        if self.e_type.value == DURATION_OPTION:
+            new_exercise = DurationExercise(
+                self.e_name.value,
+                duration_input_to_seconds(self.duration_input.value),
+            )
+        elif self.e_type.value == REPETITION_OPTION:
+            new_exercise = RepetitionExercise(
+                self.e_name.value, int(self.rep_input.value)
+            )
+        return new_exercise
+
     def compose(self) -> ComposeResult:
         self.e_name = Input(
             placeholder="Exercise Name",
@@ -154,7 +166,9 @@ class ExerciseInputWidget(HorizontalGroup):
         )
         yield self.rep_input
         yield HorizontalGroup(
-            Button("Add", id="add-btn"), Button("Cancel", id="cancel-btn")
+            Button("Add", id="add-btn"),
+            Button("Save", id="save-exercise-edit-btn"),
+            Button("Cancel", id="cancel-btn"),
         )  # TODO: add edit button when updating exercise info
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
@@ -165,15 +179,7 @@ class ExerciseInputWidget(HorizontalGroup):
                 # TODO: show a popup for user
                 return
 
-            if self.e_type.value == DURATION_OPTION:
-                new_exercise = DurationExercise(
-                    self.e_name.value,
-                    duration_input_to_seconds(self.duration_input.value),
-                )
-            elif self.e_type.value == REPETITION_OPTION:
-                new_exercise = RepetitionExercise(
-                    self.e_name.value, int(self.rep_input.value)
-                )
+            new_exercise = self._create_exercise()
 
             parent = self.screen.query_one("#routine-widget", RoutineWidget)
 
@@ -186,7 +192,45 @@ class ExerciseInputWidget(HorizontalGroup):
 
             save_routines(self.app.path, self.app.routines)
             self.add_class("hide")
-        if button_id == "cancel-btn":
+        elif button_id == "save-exercise-edit-btn":
+            if not self._is_form_valid():
+                log("Form not valid")
+                # TODO: show a popup for user
+                return
+
+            e = self.parent.exercise_to_edit
+            routine: Routine = self.app.routines[self.parent.r_idx]
+
+            if (
+                isinstance(e, DurationExercise)
+                and self.e_type == DURATION_OPTION
+            ):
+                e.name = self.e_name.value
+                e.duration = duration_input_to_seconds(
+                    self.duration_input.value
+                )
+            elif (
+                isinstance(e, RepetitionExercise)
+                and self.e_type == REPETITION_OPTION
+            ):
+                e.name = self.e_name.value
+                e.repetitions = int(self.rep_input.value)
+            else:  # Exercise type changed
+                new_exercise = self._create_exercise()
+                routine.replace_exercise(
+                    new_exercise, self.parent.exercise_to_edit_idx
+                )
+                e = new_exercise
+
+            # Update widget
+            self.parent.exercise_to_edit_widget.remove_children()
+            new_exercise_widget = create_exercise_widget(e)
+            new_exercise_widget = create_exercise_widget(e)
+            self.parent.exercise_to_edit_widget.mount(new_exercise_widget)
+
+            save_routines(self.app.path, self.app.routines)
+            self.add_class("hide")
+        elif button_id == "cancel-btn":
             self.add_class("hide")
 
     def on_select_changed(self, event: Select.Changed) -> None:
@@ -207,6 +251,10 @@ class RoutineWidget(HorizontalGroup):
         ("e", "edit_exercise", "Edit Exercise"),
     ]
 
+    exercise_to_edit: DurationExercise | RepetitionExercise = reactive(None)
+    exercise_to_edit_idx: int = reactive(None)
+    exercise_to_edit_widget: ExerciseWidget = reactive(None)
+
     def __init__(
         self,
         r_idx: int,
@@ -226,11 +274,18 @@ class RoutineWidget(HorizontalGroup):
         duration: str = "",
         rep: str = "",
         type: int = DURATION_OPTION,
+        editing: bool = False,
     ) -> None:
         self.e_input.e_name.value = name
         self.e_input.duration_input.value = duration
         self.e_input.rep_input.value = rep
         self.e_input.e_type.value = type
+
+        if editing:
+            self.e_input.add_class("editing-exercise")
+        elif self.e_input.has_class("editing-exercise"):
+            self.e_input.remove_class("editing-exercise")
+
         self.e_input.remove_class("hide")
         self.e_input.e_name.focus()
 
@@ -282,15 +337,22 @@ class RoutineWidget(HorizontalGroup):
 
         routine: Routine = self.app.routines[self.r_idx]
         e = routine.exercises[self.e_list.index]
+        self.exercise_to_edit = e
+        self.exercise_to_edit_idx = self.e_list.index
+        self.exercise_to_edit_widget = selected_item
         if isinstance(e, DurationExercise):
             self._show_exercise_form(
                 name=e.name,
                 duration=e.duration_mask_string(),
                 type=DURATION_OPTION,
+                editing=True,
             )
         elif isinstance(e, RepetitionExercise):
             self._show_exercise_form(
-                name=e.name, rep=str(e.repetitions), type=REPETITION_OPTION
+                name=e.name,
+                rep=str(e.repetitions),
+                type=REPETITION_OPTION,
+                editing=True,
             )
 
 
