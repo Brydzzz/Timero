@@ -225,7 +225,6 @@ class ExerciseInputWidget(HorizontalGroup):
             # Update widget
             self.parent.exercise_to_edit_widget.remove_children()
             new_exercise_widget = create_exercise_widget(e)
-            new_exercise_widget = create_exercise_widget(e)
             self.parent.exercise_to_edit_widget.mount(new_exercise_widget)
 
             save_routines(self.app.path, self.app.routines)
