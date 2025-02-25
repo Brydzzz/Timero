@@ -1,0 +1,56 @@
+Timer {
+    background: $boost;
+    # content-align: center middle;
+    # height: 5;
+    margin: 1;
+    min-width: 50;
+    max-width: 65vw;
+    padding: 1;
+    layout: grid;
+    grid-size: 2 2;
+    grid-rows: 10;
+}
+
+TimeDisplay {
+    text-align: center;
+    color: $foreground-muted;
+    height: 8;
+    column-span: 2;
+}
+
+#start {
+    # dock: left;
+    column-span: 1;
+}
+
+#stop {
+    # dock: left;
+    display: none;
+    column-span: 1;
+}
+
+#reset {
+    # dock: right;
+    column-span: 1;
+}
+
+.started {
+    background: $success-muted;
+    color: $text;
+}
+
+.started TimeDisplay {
+    color: $foreground;
+}
+
+.started #start {
+    display: none
+}
+
+.started #stop {
+    display: block
+}
+
+.started #reset {
+    visibility: hidden
+}

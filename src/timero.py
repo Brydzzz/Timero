@@ -32,6 +32,7 @@ from utils import (
     repetitions_to_str,
     seconds_to_time_str,
 )
+from widgets._timer import Timer
 
 
 class IsEmptyValidator(Validator):
@@ -457,6 +458,8 @@ class RoutineWidget(HorizontalGroup):
         if button_id == "reorder-btn":
             if self.reorder_input.has_class("hide"):
                 self.reorder_input.remove_class("hide")
+        elif button_id == "start-btn":
+            self.app.switch_screen(TimerScreen())
 
 
 class RoutineScreen(Screen):
@@ -534,6 +537,15 @@ class StartScreen(Screen):
         self.app.routines = load_routines(self.app.path)
         self.log(f"Routines {self.app.routines}")
         self.app.switch_screen(RoutinesSelectScreen())
+
+
+class TimerScreen(Screen):
+    CSS_PATH = "widgets/_timer.tcss"
+
+    def compose(self) -> ComposeResult:
+        yield Header()
+        yield Footer()
+        yield Timer()
 
 
 class TimeroApp(App):

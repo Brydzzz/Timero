@@ -200,3 +200,7 @@ ReorderWidget {
         margin: 1 1 1 6;
     }
 }
+
+TimeScreen {
+    align: center middle;
+}
