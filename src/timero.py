@@ -304,6 +304,15 @@ class RoutineWidget(HorizontalGroup):
                     if index != length - 1:
                         self._move_exercise(index, length, e)
                 case "cancel-reorder":
+                    # Reset Exercise ListView
+                    e_list: ListView = self.parent.e_list
+                    e_list.remove_children()
+                    e_list.extend(
+                        [
+                            ListItem(create_exercise_widget(e))
+                            for e in self.parent.exercises
+                        ]
+                    )
                     self.add_class("hide")
 
     def __init__(
