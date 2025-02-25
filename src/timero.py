@@ -172,14 +172,18 @@ class ExerciseInputWidget(HorizontalGroup):
             Button("Add", id="add-btn"),
             Button("Save", id="save-exercise-edit-btn"),
             Button("Cancel", id="cancel-btn"),
-        )  # TODO: add edit button when updating exercise info
+        )
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         button_id = event.button.id
         if button_id == "add-btn":
             if not self._is_form_valid():
                 log("Form not valid")
-                # TODO: show a popup for user
+                self.app.notify(
+                    message="Inputs are not valid",
+                    title="Cannot Save Exercise",
+                    severity="error",
+                )
                 return
 
             new_exercise = self._create_exercise()
@@ -196,7 +200,11 @@ class ExerciseInputWidget(HorizontalGroup):
         elif button_id == "save-exercise-edit-btn":
             if not self._is_form_valid():
                 log("Form not valid")
-                # TODO: show a popup for user
+                self.app.notify(
+                    message="Inputs are not valid",
+                    title="Cannot Save Exercise",
+                    severity="error",
+                )
                 return
 
             e = self.parent.exercise_to_edit
@@ -399,7 +407,11 @@ class RoutineWidget(HorizontalGroup):
         selected_item = self.e_list.highlighted_child
 
         if selected_item is None or not self.e_list.has_focus:
-            # TODO: popup for user
+            self.app.notify(
+                message="Please select an exercise first.",
+                title="Cannot Remove Exercise",
+                severity="warning",
+            )
             return
 
         self.e_list.remove_children([selected_item])
@@ -413,7 +425,11 @@ class RoutineWidget(HorizontalGroup):
         selected_item = self.e_list.highlighted_child
 
         if selected_item is None or not self.e_list.has_focus:
-            # TODO: popup for user
+            self.app.notify(
+                message="Please select an exercise first.",
+                title="Cannot Edit Exercise",
+                severity="warning",
+            )
             return
 
         routine: Routine = self.app.routines[self.r_idx]
