@@ -3,6 +3,10 @@ Button {
     margin: 1 2;
     width: 18;
     height: 3;
+
+    &.icon-btn {
+        max-width: 8;
+    }
 }
 
 Label {
@@ -55,7 +59,7 @@ RoutinesSelectScreen {
 }
 
 .routines-list {
-    max-width: 60vw;
+    max-width: 45vw;
     height: auto;
     border: solid $accent;
     border-title-align: left;
@@ -142,7 +146,7 @@ ExerciseInputWidget > TimeMaskedInput {
 }
 
 #exercises-scroll {
-    margin: 0 2 2 2;
+    margin: 0 2 1 2;
     background: $surface;
 
     & > ListItem {
@@ -181,5 +185,18 @@ ExerciseInputWidget > TimeMaskedInput {
             }
 
         }
+    }
+}
+
+ReorderWidget {
+    layout: grid;
+    grid-size: 6 1;
+    grid-rows: 5;
+    grid-columns: 1fr 1fr 1fr 1fr 2fr 2fr;
+    margin: 0 1 1 1;
+
+
+    #save-reorder {
+        margin: 1 1 1 6;
     }
 }

@@ -64,9 +64,10 @@ class TimeValidator(Validator):
 class ExerciseWidget(HorizontalGroup):
     """An exercise widget"""
 
-    def __init__(self, e_name: str, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, exercise, e_name: str, *args, **kwargs):
+        super().__init__(*args, **kwargs, classes="exercise-widget")
         self.e_name = e_name
+        self.exercise = exercise
 
     def compose(self) -> ComposeResult:
         yield HorizontalGroup(
@@ -75,8 +76,8 @@ class ExerciseWidget(HorizontalGroup):
 
 
 class DurationExerciseWidget(ExerciseWidget):
-    def __init__(self, e_name: str, duration: int, *args, **kwargs):
-        super().__init__(e_name, *args, **kwargs)
+    def __init__(self, exercise, e_name: str, duration: int, *args, **kwargs):
+        super().__init__(exercise, e_name, *args, **kwargs)
         self.duration = duration
 
     def compose(self) -> ComposeResult:
@@ -87,8 +88,10 @@ class DurationExerciseWidget(ExerciseWidget):
 
 
 class RepetitionExerciseWidget(ExerciseWidget):
-    def __init__(self, e_name: str, repetitions: int, *args, **kwargs):
-        super().__init__(e_name, *args, **kwargs)
+    def __init__(
+        self, exercise, e_name: str, repetitions: int, *args, **kwargs
+    ):
+        super().__init__(exercise, e_name, *args, **kwargs)
         self.repetitions = repetitions
 
     def compose(self) -> ComposeResult:
@@ -116,9 +119,9 @@ REPETITION_OPTION = 2
 
 def create_exercise_widget(e: Exercise) -> ExerciseWidget:
     if isinstance(e, DurationExercise):
-        return DurationExerciseWidget(e.name, e.duration)
+        return DurationExerciseWidget(e, e.name, e.duration)
     elif isinstance(e, RepetitionExercise):
-        return RepetitionExerciseWidget(e.name, e.repetitions)
+        return RepetitionExerciseWidget(e, e.name, e.repetitions)
 
 
 class ExerciseInputWidget(HorizontalGroup):
@@ -181,13 +184,11 @@ class ExerciseInputWidget(HorizontalGroup):
 
             new_exercise = self._create_exercise()
 
-            parent = self.screen.query_one("#routine-widget", RoutineWidget)
-
             new_widget = ListItem(create_exercise_widget(new_exercise))
-            parent.query_one("#exercises-scroll").mount(new_widget)
+            self.parent.query_one("#exercises-scroll").mount(new_widget)
             new_widget.scroll_visible()
 
-            routine: Routine = self.app.routines[parent.r_idx]
+            routine: Routine = self.app.routines[self.parent.r_idx]
             routine.add_exercise(new_exercise)
 
             save_routines(self.app.path, self.app.routines)
@@ -254,6 +255,57 @@ class RoutineWidget(HorizontalGroup):
     exercise_to_edit_idx: int = reactive(None)
     exercise_to_edit_widget: ExerciseWidget = reactive(None)
 
+    class ReorderWidget(HorizontalGroup):
+
+        def _get_exercise_to_move(self) -> tuple[int, Exercise]:
+            e_list: ListView = self.parent.e_list
+            index = e_list.index
+            item: ListItem = e_list.highlighted_child
+            e_widget: ExerciseWidget = item.query_one(".exercise-widget")
+            exercise_moved = e_widget.exercise
+            return index, exercise_moved
+
+        def _move_exercise(self, index, target_index, exercise) -> None:
+            e_list: ListView = self.parent.e_list
+            e_list.pop(index)
+            e_list.insert(
+                target_index,
+                [ListItem(create_exercise_widget(exercise))],
+            )
+            e_list.index = target_index
+
+        def compose(self) -> ComposeResult:
+            yield Button("🔼", id="move-up", classes="icon-btn")
+            yield Button("⏫", id="move-top", classes="icon-btn")
+            yield Button("🔽", id="move-down", classes="icon-btn")
+            yield Button("⏬", id="move-bottom", classes="icon-btn")
+            yield Button("Save", id="save-reorder")
+            yield Button("Cancel", id="cancel-reorder", variant="error")
+
+        def on_button_pressed(self, event: Button.Pressed) -> None:
+            button_id = event.button.id
+            match button_id:
+                case "move-up":
+                    index, e = self._get_exercise_to_move()
+                    if index > 0:
+                        self._move_exercise(index, index - 1, e)
+                case "move-top":
+                    index, e = self._get_exercise_to_move()
+                    if index != 0:
+                        self._move_exercise(index, 0, e)
+                case "move-down":
+                    index, e = self._get_exercise_to_move()
+                    e_list: ListView = self.parent.e_list
+                    if index < len(e_list.children) - 1:
+                        self._move_exercise(index, index + 2, e)
+                case "move-bottom":
+                    index, e = self._get_exercise_to_move()
+                    length = len(self.parent.e_list.children)
+                    if index != length - 1:
+                        self._move_exercise(index, length, e)
+                case "cancel-reorder":
+                    self.add_class("hide")
+
     def __init__(
         self,
         r_idx: int,
@@ -309,6 +361,8 @@ class RoutineWidget(HorizontalGroup):
             id="exercises-scroll",
         )
         yield self.e_list
+        self.reorder_input = self.ReorderWidget(classes="hide")
+        yield self.reorder_input
 
     def action_add_exercise(self) -> None:
         self._show_exercise_form()
@@ -353,6 +407,12 @@ class RoutineWidget(HorizontalGroup):
                 type=REPETITION_OPTION,
                 editing=True,
             )
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        button_id = event.button.id
+        if button_id == "reorder-btn":
+            if self.reorder_input.has_class("hide"):
+                self.reorder_input.remove_class("hide")
 
 
 class RoutineScreen(Screen):
