@@ -287,22 +287,41 @@ class RoutineWidget(HorizontalGroup):
             match button_id:
                 case "move-up":
                     index, e = self._get_exercise_to_move()
+
                     if index > 0:
                         self._move_exercise(index, index - 1, e)
                 case "move-top":
                     index, e = self._get_exercise_to_move()
+
                     if index != 0:
                         self._move_exercise(index, 0, e)
                 case "move-down":
                     index, e = self._get_exercise_to_move()
                     e_list: ListView = self.parent.e_list
+
                     if index < len(e_list.children) - 1:
                         self._move_exercise(index, index + 2, e)
                 case "move-bottom":
                     index, e = self._get_exercise_to_move()
                     length = len(self.parent.e_list.children)
+
                     if index != length - 1:
                         self._move_exercise(index, length, e)
+                case "save-reorder":
+                    reordered_exercises = []
+
+                    for list_item in self.parent.e_list.children:
+                        exercise = list_item.children[0].exercise
+                        reordered_exercises.append(exercise)
+
+                    self.parent.exercises = reordered_exercises
+
+                    routine = self.app.routines[self.parent.r_idx]
+                    routine.exercises = reordered_exercises
+
+                    save_routines(self.app.path, self.app.routines)
+
+                    self.add_class("hide")
                 case "cancel-reorder":
                     # Reset Exercise ListView
                     e_list: ListView = self.parent.e_list
