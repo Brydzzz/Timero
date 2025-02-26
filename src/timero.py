@@ -545,7 +545,7 @@ class TimerScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Header()
         yield Footer()
-        yield Timer()
+        yield Timer(duration_time=5.0)
 
 
 class TimeroApp(App):
