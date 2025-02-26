@@ -201,6 +201,6 @@ ReorderWidget {
     }
 }
 
-TimeScreen {
+TimerScreen {
     align: center middle;
 }

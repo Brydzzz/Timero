@@ -1,7 +1,7 @@
 from time import monotonic
 
 from textual.app import ComposeResult
-from textual.containers import HorizontalGroup
+from textual.containers import Container, VerticalGroup
 from textual.reactive import reactive
 from textual.widgets import Button, Digits
 
@@ -50,7 +50,7 @@ class TimeDisplay(Digits):
         self.time = 5.0
 
 
-class Timer(HorizontalGroup):
+class Timer(VerticalGroup):
     """A timer widget."""
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
@@ -69,6 +69,9 @@ class Timer(HorizontalGroup):
     def compose(self) -> ComposeResult:
         """Create child widgets of a timer."""
         yield TimeDisplay()
-        yield Button("Start", id="start", variant="success")
-        yield Button("Stop", id="stop", variant="error")
-        yield Button("Resetuj", id="reset")
+        yield Container(
+            Button("Start", id="start", variant="success"),
+            Button("Stop", id="stop", variant="error"),
+            Button("Resetuj", id="reset"),
+            id="timer-btn-container",
+        )
