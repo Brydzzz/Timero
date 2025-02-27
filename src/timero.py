@@ -33,7 +33,6 @@ from widgets.exercises import create_exercise_widget
 
 
 class RoutineWidget(HorizontalGroup):
-    """A routine widget."""
 
     BINDINGS = [
         ("a", "add_exercise", "Add Exercise"),
@@ -244,8 +243,6 @@ class RoutineWidget(HorizontalGroup):
 
 
 class TimeroApp(App):
-    """A Textual app to manage stopwatches."""
-
     CSS_PATH = "timero.tcss"
     BINDINGS = [("h", "go_home", "Go to homepage")]
 
