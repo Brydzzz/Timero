@@ -18,15 +18,16 @@ from textual.widgets import (
 
 from textual import log
 from textual.validation import Validator, ValidationResult
-
+from screens.start import StartScreen
 from routine import (
     DurationExercise,
     Exercise,
     RepetitionExercise,
     Routine,
-    load_routines,
     save_routines,
 )
+
+from screens.manager import ScreenManager
 from utils import (
     duration_input_to_seconds,
     repetitions_to_str,
@@ -462,83 +463,6 @@ class RoutineWidget(HorizontalGroup):
             self.app.switch_screen(TimerScreen(r_idx=self.r_idx))
 
 
-class RoutineScreen(Screen):
-    """Screen with selected routine"""
-
-    BINDINGS = [("b", "go_back", "Go back to select routine")]
-
-    def __init__(self, r_idx: int, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.routine_idx = r_idx
-        self.routine = self.app.routines[r_idx]
-
-    def compose(self):
-        yield Header()
-        yield Footer()
-        yield (
-            RoutineWidget(
-                r_idx=self.routine_idx,
-                r_name=self.routine.name,
-                exercises=self.routine.exercises,
-                id="routine-widget",
-            )
-        )
-
-    def action_go_back(self) -> None:
-        self.app.switch_screen(RoutinesSelectScreen())
-
-
-class RoutinesSelectScreen(Screen):
-    """Screen with all routines"""
-
-    def compose(self) -> ComposeResult:
-        yield Header()
-        yield Footer()
-        items = (
-            ListItem(Label(r.name), name=str(idx))
-            for idx, r in enumerate(self.app.routines)
-        )
-        lv = ListView(*items, classes="routines-list")
-        lv.border_title = "Select Routine: "
-        yield lv
-
-    def on_list_view_selected(self, event: ListView.Selected) -> None:
-        """Event handler called when list item is selected."""
-        idx = int(event.item.name)
-        self.app.switch_screen(RoutineScreen(r_idx=idx))
-
-
-class StartScreen(Screen):
-    """Start screen for the app"""
-
-    BINDINGS = [
-        ("l", "load_routine", "Load routines"),
-        ("c", "create_routine", "Create new routine"),
-    ]
-
-    def compose(self) -> ComposeResult:
-        yield Header()
-        yield Footer()
-        yield HorizontalGroup(
-            Button("Load Routine", id="load-btn"),
-            Button("Create Routine", id="create-btn"),
-            id="start-btns",
-        )
-
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        """Event handler called when a button is pressed."""
-        button_id = event.button.id
-        if button_id == "load-btn":
-            self.action_load_routine()
-        elif button_id == "create-btn":
-            pass
-
-    def action_load_routine(self) -> None:
-        self.app.routines = load_routines(self.app.path)
-        self.log(f"Routines {self.app.routines}")
-        self.app.switch_screen(RoutinesSelectScreen())
-
-
 class TimerScreen(Screen):
     CSS_PATH = "widgets/_timer.tcss"
 
@@ -551,7 +475,9 @@ class TimerScreen(Screen):
     def handle_next_exercise(self):
         e = next(self.exercise_iter, None)
         if not e:
-            self.app.switch_screen(RoutineScreen(self.routine_idx))
+            from screens.routine_view import RoutineViewScreen
+
+            self.app.switch_screen(RoutineViewScreen(self.routine_idx))
             return
 
         if isinstance(e, DurationExercise):
@@ -619,6 +545,7 @@ class TimeroApp(App):
         self.install_screen(StartScreen(id="start"), name="start")
         self.push_screen("start")
         self.theme = "dracula"
+        self.screen_manager = ScreenManager(self)
 
     def action_go_home(self) -> None:
         self.app.switch_screen("start")

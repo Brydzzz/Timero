@@ -68,7 +68,7 @@ RoutinesSelectScreen {
 
 
 # Routine View
-RoutineScreen {
+RoutineViewScreen {
     align: center top;
 }
 
