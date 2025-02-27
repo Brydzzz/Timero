@@ -26,6 +26,95 @@ from widgets.exercise_input import (
 from widgets.exercises import create_exercise_widget
 
 
+class RoutineController:
+    def __init__(self, app):
+        self.app = app
+        self.routine = self.app.routines[self.app.curr_routine_idx]
+
+    def save_routine(self, reordered_exercises):
+        self.routine.exercises = reordered_exercises
+        save_routines(self.app.path, self.app.routines)
+
+    def remove_exercise(self, index):
+        self.routine.exercises.pop(index)
+        save_routines(self.app.path, self.app.routines)
+
+
+class ReorderWidget(HorizontalGroup):
+
+    def compose(self) -> ComposeResult:
+        yield Button("🔼", id="move-up", classes="icon-btn")
+        yield Button("⏫", id="move-top", classes="icon-btn")
+        yield Button("🔽", id="move-down", classes="icon-btn")
+        yield Button("⏬", id="move-bottom", classes="icon-btn")
+        yield Button("Save", id="save-reorder")
+        yield Button("Cancel", id="cancel-reorder", variant="error")
+
+    def _get_exercise_to_move(self) -> tuple[int, Exercise]:
+        e_list: ListView = self.parent.e_list
+        index = e_list.index
+        item: ListItem = e_list.highlighted_child
+        e_widget = item.query_one(".exercise-widget")
+        exercise_moved = e_widget.exercise
+        return index, exercise_moved
+
+    def _move_exercise(self, index, target_index, exercise) -> None:
+        e_list: ListView = self.parent.e_list
+        e_list.pop(index)
+        e_list.insert(
+            target_index,
+            [ListItem(create_exercise_widget(exercise))],
+        )
+        e_list.index = target_index
+
+    def _save_reordered_exercises(self):
+        reordered_exercises = []
+
+        for list_item in self.parent.e_list.children:
+            exercise = list_item.children[0].exercise
+            reordered_exercises.append(exercise)
+
+        self.parent.controller.save_routine(reordered_exercises)
+
+    def _reset_exercise_list(self):
+        e_list: ListView = self.parent.e_list
+        e_list.remove_children()
+        e_list.extend(
+            [
+                ListItem(create_exercise_widget(e))
+                for e in self.controller.routine.exercises
+            ]
+        )
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        button_id = event.button.id
+        match button_id:
+            case "move-up":
+                index, e = self._get_exercise_to_move()
+                if index > 0:
+                    self._move_exercise(index, index - 1, e)
+            case "move-top":
+                index, e = self._get_exercise_to_move()
+                if index != 0:
+                    self._move_exercise(index, 0, e)
+            case "move-down":
+                index, e = self._get_exercise_to_move()
+                e_list: ListView = self.parent.e_list
+                if index < len(e_list.children) - 1:
+                    self._move_exercise(index, index + 2, e)
+            case "move-bottom":
+                index, e = self._get_exercise_to_move()
+                length = len(self.parent.e_list.children)
+                if index != length - 1:
+                    self._move_exercise(index, length, e)
+            case "save-reorder":
+                self._save_reordered_exercises()
+                self.add_class("hide")
+            case "cancel-reorder":
+                self._reset_exercise_list()
+                self.add_class("hide")
+
+
 class RoutineWidget(HorizontalGroup):
 
     BINDINGS = [
@@ -38,84 +127,9 @@ class RoutineWidget(HorizontalGroup):
     exercise_to_edit_idx: int = reactive(None)
     exercise_to_edit_widget = reactive(None)
 
-    class ReorderWidget(HorizontalGroup):
-
-        def compose(self) -> ComposeResult:
-            yield Button("🔼", id="move-up", classes="icon-btn")
-            yield Button("⏫", id="move-top", classes="icon-btn")
-            yield Button("🔽", id="move-down", classes="icon-btn")
-            yield Button("⏬", id="move-bottom", classes="icon-btn")
-            yield Button("Save", id="save-reorder")
-            yield Button("Cancel", id="cancel-reorder", variant="error")
-
-        def _get_exercise_to_move(self) -> tuple[int, Exercise]:
-            e_list: ListView = self.parent.e_list
-            index = e_list.index
-            item: ListItem = e_list.highlighted_child
-            e_widget = item.query_one(".exercise-widget")
-            exercise_moved = e_widget.exercise
-            return index, exercise_moved
-
-        def _move_exercise(self, index, target_index, exercise) -> None:
-            e_list: ListView = self.parent.e_list
-            e_list.pop(index)
-            e_list.insert(
-                target_index,
-                [ListItem(create_exercise_widget(exercise))],
-            )
-            e_list.index = target_index
-
-        def on_button_pressed(self, event: Button.Pressed) -> None:
-            button_id = event.button.id
-            match button_id:
-                case "move-up":
-                    index, e = self._get_exercise_to_move()
-
-                    if index > 0:
-                        self._move_exercise(index, index - 1, e)
-                case "move-top":
-                    index, e = self._get_exercise_to_move()
-
-                    if index != 0:
-                        self._move_exercise(index, 0, e)
-                case "move-down":
-                    index, e = self._get_exercise_to_move()
-                    e_list: ListView = self.parent.e_list
-
-                    if index < len(e_list.children) - 1:
-                        self._move_exercise(index, index + 2, e)
-                case "move-bottom":
-                    index, e = self._get_exercise_to_move()
-                    length = len(self.parent.e_list.children)
-
-                    if index != length - 1:
-                        self._move_exercise(index, length, e)
-                case "save-reorder":
-                    reordered_exercises = []
-
-                    for list_item in self.parent.e_list.children:
-                        exercise = list_item.children[0].exercise
-                        reordered_exercises.append(exercise)
-
-                    self.parent.exercises = reordered_exercises
-
-                    routine = self.app.routines[self.app.curr_routine_idx]
-                    routine.exercises = reordered_exercises
-
-                    save_routines(self.app.path, self.app.routines)
-
-                    self.add_class("hide")
-                case "cancel-reorder":
-                    # Reset Exercise ListView
-                    e_list: ListView = self.parent.e_list
-                    e_list.remove_children()
-                    e_list.extend(
-                        [
-                            ListItem(create_exercise_widget(e))
-                            for e in self.parent.exercises
-                        ]
-                    )
-                    self.add_class("hide")
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.controller = RoutineController(self.app)
 
     def _show_exercise_form(
         self,
@@ -139,10 +153,9 @@ class RoutineWidget(HorizontalGroup):
         self.e_input.e_name.focus()
 
     def compose(self) -> ComposeResult:
-        routine: Routine = self.app.routines[self.app.curr_routine_idx]
         yield HorizontalGroup(
             Label(
-                routine.name,
+                self.controller.routine.name,
                 classes="routine-name",
             ),
             HorizontalGroup(
@@ -152,14 +165,19 @@ class RoutineWidget(HorizontalGroup):
             ),
             classes="routine-header",
         )
+
         self.e_input = ExerciseInputWidget(id="exercise-input", classes="hide")
         yield self.e_input
         self.e_list = ListView(
-            *[ListItem(create_exercise_widget(e)) for e in routine.exercises],
+            *[
+                ListItem(create_exercise_widget(e))
+                for e in self.controller.routine.exercises
+            ],
             id="exercises-scroll",
         )
         yield self.e_list
-        self.reorder_input = self.ReorderWidget(classes="hide")
+
+        self.reorder_input = ReorderWidget(classes="hide")
         yield self.reorder_input
 
     def action_add_exercise(self) -> None:
@@ -177,11 +195,7 @@ class RoutineWidget(HorizontalGroup):
             return
 
         self.e_list.remove_children([selected_item])
-
-        routine: Routine = self.app.routines[self.app.curr_routine_idx]
-        routine.exercises.pop(self.e_list.index)
-
-        save_routines(self.app.path, self.app.routines)
+        self.controller.remove_exercise(self.e_list.index)
 
     def action_edit_exercise(self) -> None:
         selected_item = self.e_list.highlighted_child
