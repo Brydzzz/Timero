@@ -1,5 +1,41 @@
 [
     {
+        "__type__": "Routine",
+        "name": "Test Workout",
+        "exercises": [
+          {
+            "__type__": "DurationExercise",
+            "name": "Plank",
+            "duration": 5
+          },
+          {
+            "__type__": "RepetitionExercise",
+            "name": "Push-ups",
+            "repetitions": 15
+          },
+          {
+            "__type__": "RepetitionExercise",
+            "name": "Squats",
+            "repetitions": 20
+          },
+          {
+            "__type__": "DurationExercise",
+            "name": "Lunges",
+            "duration": 7
+          },
+          {
+            "__type__": "RepetitionExercise",
+            "name": "Bicycle Crunches",
+            "repetitions": 20
+          },
+          {
+            "__type__": "DurationExercise",
+            "name": "Mountain Climbers",
+            "duration": 10
+          }
+        ]
+      },
+    {
       "__type__": "Routine",
       "name": "Morning Workout",
       "exercises": [
