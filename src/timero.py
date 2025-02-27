@@ -252,12 +252,6 @@ class TimeroApp(App):
     routines: list[Routine] = reactive(None)
     path = var(Path(__file__).parent.parent / "routines.json")
 
-    def compose(self) -> ComposeResult:
-        """Create child widgets for the app."""
-        yield Header()
-        yield Footer()
-        yield Static("App")
-
     def on_mount(self) -> None:
         self.install_screen(StartScreen(id="start"), name="start")
         self.push_screen("start")
