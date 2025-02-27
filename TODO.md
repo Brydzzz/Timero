@@ -1,1 +1,0 @@
-change current routine idx to global reactive var
