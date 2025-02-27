@@ -23,7 +23,6 @@ class StartScreen(Screen):
         )
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        """Event handler called when a button is pressed."""
         button_id = event.button.id
         if button_id == "load-btn":
             self.action_load_routine()
@@ -32,5 +31,4 @@ class StartScreen(Screen):
 
     def action_load_routine(self) -> None:
         self.app.routines = load_routines(self.app.path)
-        self.log(f"Routines {self.app.routines}")
         self.app.screen_manager.go_to_routine_select()
