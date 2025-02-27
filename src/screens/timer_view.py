@@ -3,7 +3,7 @@ from textual.app import ComposeResult
 from textual.widgets import Label, Header, Footer, Button
 from textual.containers import VerticalGroup
 from routine import DurationExercise, RepetitionExercise
-from widgets.timer import Timer
+from widgets.timer import TimeDisplay, Timer
 
 
 class TimerView(Screen):
@@ -30,12 +30,6 @@ class TimerView(Screen):
             label = self.rep_widget.query_one(Label)
             label.update(f"{e.name} \n Repetitions: {e.repetitions}")
 
-    def display_next_exercise(self, time_to_display: float) -> None:
-        if time_to_display != 0.0:
-            return
-
-        self.handle_next_exercise()
-
     def compose(self) -> ComposeResult:
         yield Header()
         yield Footer()
@@ -52,11 +46,9 @@ class TimerView(Screen):
 
     def on_mount(self) -> None:
         self.handle_next_exercise()
-        self.watch(
-            self.query_one("TimeDisplay"),
-            "time_to_display",
-            self.display_next_exercise,
-        )
+
+    def on_time_display_ended(self, event: TimeDisplay.Ended) -> None:
+        self.handle_next_exercise()
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         button_id = event.button.id

@@ -4,6 +4,7 @@ from textual.app import ComposeResult
 from textual.containers import Container, VerticalGroup
 from textual.reactive import reactive
 from textual.widgets import Button, Digits
+from textual.message import Message
 
 
 class TimeDisplay(Digits):
@@ -15,13 +16,30 @@ class TimeDisplay(Digits):
     time_to_display = reactive(0.0)
     time_left = reactive(0.0)
 
+    class Ended(Message):
+        """Timer ended message."""
+
+        pass
+
+    def __init__(self, duration_time, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.duration_time = duration_time
+
+    def _format_time(self, time: float) -> str:
+        """Format time value into display string."""
+        time = max(0.0, time)
+        minutes, seconds = divmod(time, 60)
+        hours, minutes = divmod(minutes, 60)
+        return f"{hours:02,.0f}:{minutes:02.0f}:{seconds:05.2f}"
+
     def on_mount(self) -> None:
         """Event handler called when widget is added to the app."""
         self.update_timer = self.set_interval(
             1 / 60, self.update_time, pause=True
         )
-        self.time_to_display = self.parent.duration_time
-        self.time_left = self.parent.duration_time
+        self.set_reactive(TimeDisplay.time_to_display, self.duration_time)
+        self.set_reactive(TimeDisplay.time_left, self.duration_time)
+        self.update(self._format_time(self.duration_time))
 
     def update_time(self) -> None:
         self.time_to_display = max(
@@ -32,10 +50,8 @@ class TimeDisplay(Digits):
         if time == 0.0:
             self.update_timer.pause()
             self.parent.remove_class("started")
-        time = max(0.0, time)
-        minutes, seconds = divmod(time, 60)
-        hours, minutes = divmod(minutes, 60)
-        self.update(f"{hours:02,.0f}:{minutes:02.0f}:{seconds:05.2f}")
+            self.post_message(self.Ended())
+        self.update(self._format_time(time))
 
     def start(self) -> None:
         """Method to start (or resume) time updating."""
@@ -82,7 +98,7 @@ class Timer(VerticalGroup):
 
     def compose(self) -> ComposeResult:
         """Create child widgets of a timer."""
-        yield TimeDisplay()
+        yield TimeDisplay(self.duration_time)
         yield Container(
             Button("Start", id="start", variant="success"),
             Button("Stop", id="stop", variant="error"),
