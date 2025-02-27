@@ -1,4 +1,4 @@
-from src.utils import duration_input_to_seconds, seconds_to_time_str
+from utils.time_strings import duration_input_to_seconds, seconds_to_time_str
 
 
 def test_seconds_to_time_str_default():
