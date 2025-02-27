@@ -3,7 +3,7 @@ from textual.containers import HorizontalGroup
 from textual.widgets import Label
 from routine import DurationExercise, RepetitionExercise, Exercise
 
-from utils import (
+from utils.time_strings import (
     repetitions_to_str,
     seconds_to_time_str,
 )

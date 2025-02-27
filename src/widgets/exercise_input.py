@@ -11,7 +11,7 @@ from routine import (
     Routine,
     save_routines,
 )
-from utils import duration_input_to_seconds
+from utils.time_strings import duration_input_to_seconds
 from validators import IsEmptyValidator
 
 DURATION_OPTION = 1
