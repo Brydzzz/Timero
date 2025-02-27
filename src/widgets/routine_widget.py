@@ -40,6 +40,14 @@ class RoutineWidget(HorizontalGroup):
 
     class ReorderWidget(HorizontalGroup):
 
+        def compose(self) -> ComposeResult:
+            yield Button("🔼", id="move-up", classes="icon-btn")
+            yield Button("⏫", id="move-top", classes="icon-btn")
+            yield Button("🔽", id="move-down", classes="icon-btn")
+            yield Button("⏬", id="move-bottom", classes="icon-btn")
+            yield Button("Save", id="save-reorder")
+            yield Button("Cancel", id="cancel-reorder", variant="error")
+
         def _get_exercise_to_move(self) -> tuple[int, Exercise]:
             e_list: ListView = self.parent.e_list
             index = e_list.index
@@ -56,14 +64,6 @@ class RoutineWidget(HorizontalGroup):
                 [ListItem(create_exercise_widget(exercise))],
             )
             e_list.index = target_index
-
-        def compose(self) -> ComposeResult:
-            yield Button("🔼", id="move-up", classes="icon-btn")
-            yield Button("⏫", id="move-top", classes="icon-btn")
-            yield Button("🔽", id="move-down", classes="icon-btn")
-            yield Button("⏬", id="move-bottom", classes="icon-btn")
-            yield Button("Save", id="save-reorder")
-            yield Button("Cancel", id="cancel-reorder", variant="error")
 
         def on_button_pressed(self, event: Button.Pressed) -> None:
             button_id = event.button.id
@@ -116,19 +116,6 @@ class RoutineWidget(HorizontalGroup):
                         ]
                     )
                     self.add_class("hide")
-
-    # def __init__(
-    #     self,
-    #     r_idx: int,
-    #     r_name: str,
-    #     exercises: list[Exercise],
-    #     *args,
-    #     **kwargs,
-    # ):
-    #     super().__init__(*args, **kwargs)
-    #     self.r_idx = r_idx
-    #     self.r_name = r_name.replace(" ", "-")
-    #     self.exercises = exercises
 
     def _show_exercise_form(
         self,
@@ -212,6 +199,7 @@ class RoutineWidget(HorizontalGroup):
         self.exercise_to_edit = e
         self.exercise_to_edit_idx = self.e_list.index
         self.exercise_to_edit_widget = selected_item
+
         if isinstance(e, DurationExercise):
             self._show_exercise_form(
                 name=e.name,
