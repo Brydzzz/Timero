@@ -9,10 +9,6 @@ from textual.widgets import Button, Digits
 class TimeDisplay(Digits):
     """A widget to display elapsed time."""
 
-    def __init__(self, duration_time: float, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.duration_time = duration_time
-
     CSS_PATH = "_timer.tcss"
 
     start_time = reactive(monotonic)
@@ -24,18 +20,18 @@ class TimeDisplay(Digits):
         self.update_timer = self.set_interval(
             1 / 60, self.update_time, pause=True
         )
-        self.time_to_display = self.duration_time
-        self.time_left = self.duration_time
+        self.time_to_display = self.parent.duration_time
+        self.time_left = self.parent.duration_time
 
     def update_time(self) -> None:
         self.time_to_display = max(
             0.0, self.time_left - (monotonic() - self.start_time)
         )
-        if self.time_to_display == 0.0:
-            self.update_timer.pause()
-            self.parent.remove_class("started")
 
     def watch_time_to_display(self, time: float) -> None:
+        if time == 0.0:
+            self.update_timer.pause()
+            self.parent.remove_class("started")
         time = max(0.0, time)
         minutes, seconds = divmod(time, 60)
         hours, minutes = divmod(minutes, 60)
@@ -54,8 +50,8 @@ class TimeDisplay(Digits):
 
     def reset(self) -> None:
         """Method to reset the time display to zero."""
-        self.time_left = self.duration_time
-        self.time_to_display = self.duration_time
+        self.time_left = self.parent.duration_time
+        self.time_to_display = self.parent.duration_time
 
 
 class Timer(VerticalGroup):
@@ -64,6 +60,12 @@ class Timer(VerticalGroup):
     def __init__(self, duration_time: float, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.duration_time = duration_time
+
+    def change_duration_time(self, new_time: float):
+        self.duration_time = new_time
+        time_display = self.query_one(TimeDisplay)
+        time_display.time_left = self.duration_time
+        time_display.time_to_display = self.duration_time
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Event handler called when a button is pressed."""
@@ -80,7 +82,7 @@ class Timer(VerticalGroup):
 
     def compose(self) -> ComposeResult:
         """Create child widgets of a timer."""
-        yield TimeDisplay(duration_time=self.duration_time)
+        yield TimeDisplay()
         yield Container(
             Button("Start", id="start", variant="success"),
             Button("Stop", id="stop", variant="error"),
