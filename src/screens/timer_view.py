@@ -7,20 +7,17 @@ from widgets.timer import Timer
 
 
 class TimerView(Screen):
-    CSS_PATH = "widgets/timer.tcss"
+    CSS_PATH = "../widgets/timer.tcss"
 
-    def __init__(self, r_idx: int, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.routine_idx = r_idx
-        self.routine = self.app.routines[r_idx]
+        self.routine = self.app.routines[self.app.curr_routine_idx]
         self.exercise_iter = iter(self.routine.exercises)
 
     def handle_next_exercise(self):
         e = next(self.exercise_iter, None)
         if not e:
-            from screens.routine_view import RoutineViewScreen
-
-            self.app.switch_screen(RoutineViewScreen(self.routine_idx))
+            self.app.screen_manager.go_to_routine()
             return
 
         if isinstance(e, DurationExercise):
@@ -38,8 +35,6 @@ class TimerView(Screen):
             return
 
         self.handle_next_exercise()
-        # self.timer.add_class("hide")
-        # self.rep_widget.remove_class("hide")
 
     def compose(self) -> ComposeResult:
         yield Header()

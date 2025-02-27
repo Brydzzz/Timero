@@ -86,7 +86,7 @@ class ExerciseInputWidget(HorizontalGroup):
             self.parent.query_one("#exercises-scroll").mount(new_widget)
             new_widget.scroll_visible()
 
-            routine: Routine = self.app.routines[self.parent.r_idx]
+            routine: Routine = self.app.routines[self.app.curr_routine_idx]
             routine.add_exercise(new_exercise)
 
             save_routines(self.app.path, self.app.routines)
@@ -102,7 +102,7 @@ class ExerciseInputWidget(HorizontalGroup):
                 return
 
             e = self.parent.exercise_to_edit
-            routine: Routine = self.app.routines[self.parent.r_idx]
+            routine: Routine = self.app.routines[self.app.curr_routine_idx]
 
             if (
                 isinstance(e, DurationExercise)
