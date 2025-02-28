@@ -24,6 +24,7 @@ class TimerView(Screen):
             self.rep_widget.add_class("hide")
             self.timer.remove_class("hide")
             self.timer.change_duration_time(e.duration)
+            self.timer.update_title(e.name)
         elif isinstance(e, RepetitionExercise):
             self.timer.add_class("hide")
             self.rep_widget.remove_class("hide")
@@ -34,7 +35,7 @@ class TimerView(Screen):
         yield Header()
         yield Footer()
 
-        self.timer = Timer(duration_time=5.0, id="exercise-timer")
+        self.timer = Timer(title="", duration_time=5.0, id="exercise-timer")
         yield self.timer
 
         self.rep_widget = VerticalGroup(

@@ -3,7 +3,7 @@ from time import monotonic
 from textual.app import ComposeResult
 from textual.containers import Container, VerticalGroup
 from textual.reactive import reactive
-from textual.widgets import Button, Digits
+from textual.widgets import Button, Digits, Label
 from textual.message import Message
 
 
@@ -73,9 +73,10 @@ class TimeDisplay(Digits):
 class Timer(VerticalGroup):
     """A timer widget."""
 
-    def __init__(self, duration_time: float, *args, **kwargs):
+    def __init__(self, title: str, duration_time: float, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.duration_time = duration_time
+        self.title = title
 
     def change_duration_time(self, new_time: float):
         self.duration_time = new_time
@@ -98,6 +99,9 @@ class Timer(VerticalGroup):
 
     def compose(self) -> ComposeResult:
         """Create child widgets of a timer."""
+        yield Container(
+            Label(self.title, id="timer-title"), id="title-container"
+        )
         yield TimeDisplay(self.duration_time)
         yield Container(
             Button("Start", id="start", variant="success"),
@@ -105,3 +109,7 @@ class Timer(VerticalGroup):
             Button("Resetuj", id="reset"),
             id="timer-btn-container",
         )
+
+    def update_title(self, new_title: str):
+        label = self.query_one("#timer-title", Label)
+        label.update(new_title)
