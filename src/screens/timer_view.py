@@ -9,6 +9,8 @@ from widgets.train_repetition import TrainRepetitionWidget
 class TimerView(Screen):
     CSS_PATH = "../widgets/timer.tcss"
 
+    BINDINGS = [("s", "skip_exercise", "Skip Exercise")]
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.routine = self.app.routines[self.app.curr_routine_idx]
@@ -37,10 +39,6 @@ class TimerView(Screen):
         yield Header(classes="no-remove")
         yield Footer(classes="no-remove")
 
-        # TODO add skip exercise button
-
-        # yield Button("Skip")
-
     def on_mount(self) -> None:
         self.handle_next_exercise()
 
@@ -51,3 +49,8 @@ class TimerView(Screen):
         button_id = event.button.id
         if button_id == "reps-finished":
             self.handle_next_exercise()
+        elif button_id == "skip-exercise":
+            self.handle_next_exercise()
+
+    def action_skip_exercise(self):
+        self.handle_next_exercise()
