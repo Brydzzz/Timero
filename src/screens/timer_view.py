@@ -1,9 +1,9 @@
 from textual.screen import Screen
 from textual.app import ComposeResult
-from textual.widgets import Label, Header, Footer, Button
-from textual.containers import VerticalGroup
+from textual.widgets import Header, Footer, Button
 from routine import DurationExercise, RepetitionExercise
 from widgets.timer import TimeDisplay, Timer
+from widgets.train_repetition import TrainRepetitionWidget
 
 
 class TimerView(Screen):
@@ -20,30 +20,26 @@ class TimerView(Screen):
             self.app.screen_manager.go_to_routine()
             return
 
+        children = self.query_children()
+        train_widgets = children.exclude(".no-remove")
+        self.remove_children(train_widgets)
+
         if isinstance(e, DurationExercise):
-            self.rep_widget.add_class("hide")
-            self.timer.remove_class("hide")
-            self.timer.change_duration_time(e.duration)
-            self.timer.update_title(e.name)
+            timer_widget = Timer(
+                title=e.name, duration_time=e.duration, id="exercise-timer"
+            )
+            self.mount(timer_widget)
         elif isinstance(e, RepetitionExercise):
-            self.timer.add_class("hide")
-            self.rep_widget.remove_class("hide")
-            label = self.rep_widget.query_one(Label)
-            label.update(f"{e.name} \n Repetitions: {e.repetitions}")
+            train_widget = TrainRepetitionWidget(e)
+            self.mount(train_widget)
 
     def compose(self) -> ComposeResult:
-        yield Header()
-        yield Footer()
+        yield Header(classes="no-remove")
+        yield Footer(classes="no-remove")
 
-        self.timer = Timer(title="", duration_time=5.0, id="exercise-timer")
-        yield self.timer
+        # TODO add skip exercise button
 
-        self.rep_widget = VerticalGroup(
-            Label("Repetition Widget"),
-            Button("Next", id="next-exercise", variant="primary"),
-        )
-        self.rep_widget.add_class("hide")
-        yield self.rep_widget
+        # yield Button("Skip")
 
     def on_mount(self) -> None:
         self.handle_next_exercise()
@@ -53,5 +49,5 @@ class TimerView(Screen):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         button_id = event.button.id
-        if button_id == "next-exercise":
+        if button_id == "reps-finished":
             self.handle_next_exercise()
