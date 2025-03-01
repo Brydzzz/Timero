@@ -110,6 +110,9 @@ class Timer(VerticalGroup):
             id="timer-btn-container",
         )
 
+    def on_mount(self) -> None:
+        self.query_one("#start", Button).focus()
+
     def update_title(self, new_title: str):
         label = self.query_one("#timer-title", Label)
         label.update(new_title)
