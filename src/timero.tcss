@@ -201,6 +201,6 @@ ReorderWidget {
     }
 }
 
-TimerView {
+TrainView {
     align: center middle;
 }

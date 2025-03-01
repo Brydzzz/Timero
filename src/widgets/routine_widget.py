@@ -17,7 +17,7 @@ from routine import (
 )
 
 
-from screens.timer_view import TimerView
+from screens.train_view import TrainView
 from widgets.exercise_input import (
     DURATION_OPTION,
     REPETITION_OPTION,
@@ -235,4 +235,4 @@ class RoutineWidget(HorizontalGroup):
             if self.reorder_input.has_class("hide"):
                 self.reorder_input.remove_class("hide")
         elif button_id == "start-btn":
-            self.app.switch_screen(TimerView())
+            self.app.switch_screen(TrainView())

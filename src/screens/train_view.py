@@ -6,7 +6,7 @@ from widgets.timer import TimeDisplay, Timer
 from widgets.train_repetition import TrainRepetitionWidget
 
 
-class TimerView(Screen):
+class TrainView(Screen):
     CSS_PATH = "../widgets/timer.tcss"
 
     BINDINGS = [("s", "skip_exercise", "Skip Exercise")]
