@@ -2,8 +2,6 @@ from textual.containers import VerticalGroup, Container
 from textual.app import ComposeResult
 from textual.widgets import Label, Button, Digits
 from art import text2art
-
-# from rich.text import Text
 from routine import RepetitionExercise
 
 
@@ -15,13 +13,14 @@ class TrainRepetitionWidget(VerticalGroup):
             align: center middle;
             max-width: 55%;
             max-height: 45vh;
-            # padding: 1;
+            padding: 1;
             content-align: center middle;
         }
 
 
         #exercise-name-container {
-            align: center middle;
+            align-horizontal: center;
+            width: 100%;
         }
 
         #rep-exercise-name {
@@ -31,10 +30,9 @@ class TrainRepetitionWidget(VerticalGroup):
             text-align: center;
         }
 
-
         #repetitions-number {
             text-align: center;
-            # text-style: bold;
+            text-style: bold;
             width: 100%;
         }
 
@@ -43,10 +41,14 @@ class TrainRepetitionWidget(VerticalGroup):
             width: 100%;
             margin: 0;
             padding: 0;
+            height: 3;
+            box-sizing: border-box;
         }
 
-        #reps-finished {
+        #button-container {
             align-horizontal: center;
+            width: 100%;
+            margin: 0;
         }
     """
 
@@ -68,13 +70,13 @@ class TrainRepetitionWidget(VerticalGroup):
     def compose(self) -> ComposeResult:
         with Container(id="exercise-name-container"):
             yield Label(self.exercise.name, id="rep-exercise-name")
-        # with HorizontalGroup(id="repetitions-container"):
         yield Digits(f"{self.exercise.repetitions}", id="repetitions-number")
         yield Label(
             text2art("REPETITIONS", "straight"),
             id="repetitions-label",
         )
-        yield Button("Finished", id="reps-finished", variant="success")
+        with Container(id="button-container"):
+            yield Button("Finished", id="reps-finished", variant="success")
 
     def on_mount(self) -> None:
         self.query_one("#reps-finished", Button).focus()
