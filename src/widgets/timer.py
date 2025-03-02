@@ -106,7 +106,7 @@ class Timer(VerticalGroup):
         yield Container(
             Button("Start", id="start", variant="success"),
             Button("Stop", id="stop", variant="error"),
-            Button("Resetuj", id="reset"),
+            Button("Reset", id="reset"),
             id="timer-btn-container",
         )
 
