@@ -82,7 +82,7 @@ class ReorderWidget(HorizontalGroup):
         e_list.extend(
             [
                 ListItem(create_exercise_widget(e))
-                for e in self.controller.routine.exercises
+                for e in self.parent.controller.routine.exercises
             ]
         )
 
