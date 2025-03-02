@@ -1,8 +1,10 @@
 Timer {
     background: $boost;
     max-width: 55%;
-    max-height: 45vh;
+    max-height: 65vh;
+    margin: 1;
     padding: 1;
+    height: auto;
 }
 
 TimeDisplay {

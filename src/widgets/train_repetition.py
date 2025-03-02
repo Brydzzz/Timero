@@ -12,7 +12,9 @@ class TrainRepetitionWidget(VerticalGroup):
             background: $boost;
             align: center middle;
             max-width: 55%;
-            max-height: 45vh;
+            max-height: 65vh;
+            height: auto;
+            margin: 1;
             padding: 1;
             content-align: center middle;
         }
@@ -34,6 +36,7 @@ class TrainRepetitionWidget(VerticalGroup):
             text-align: center;
             text-style: bold;
             width: 100%;
+            margin-top: 1;
         }
 
         #repetitions-label {
@@ -48,7 +51,6 @@ class TrainRepetitionWidget(VerticalGroup):
         #button-container {
             align-horizontal: center;
             width: 100%;
-            margin: 0;
         }
     """
 
