@@ -19,7 +19,14 @@ class TimeDisplay(Digits):
     class Ended(Message):
         """Timer ended message."""
 
-        pass
+        def __init__(self, time_display: "TimeDisplay") -> None:
+            self.time_display: TimeDisplay = time_display
+            """The button that was pressed."""
+            super().__init__()
+
+        @property
+        def control(self) -> "TimeDisplay":
+            return self.time_display
 
     def __init__(self, duration_time, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -50,7 +57,7 @@ class TimeDisplay(Digits):
         if time == 0.0:
             self.update_timer.pause()
             self.parent.remove_class("started")
-            self.post_message(self.Ended())
+            self.post_message(TimeDisplay.Ended(self))
         self.update(self._format_time(time))
 
     def start(self) -> None:
@@ -110,8 +117,12 @@ class Timer(VerticalGroup):
             id="timer-btn-container",
         )
 
-    def on_mount(self) -> None:
-        self.query_one("#start", Button).focus()
+    # def on_mount(self) -> None:
+    #     self.query_one("#start", Button).focus()
+
+    def reset_timer(self) -> None:
+        time_display = self.query_one(TimeDisplay)
+        time_display.reset()
 
     def update_title(self, new_title: str):
         label = self.query_one("#timer-title", Label)
