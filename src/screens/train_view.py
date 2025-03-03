@@ -1,7 +1,7 @@
 from textual import on
 from textual.screen import Screen
 from textual.app import ComposeResult
-from textual.widgets import Header, Footer, Button
+from textual.widgets import Header, Footer, Button, ProgressBar
 from routine import DurationExercise, RepetitionExercise
 from widgets.timer import TimeDisplay, Timer
 from widgets.train_repetition import TrainRepetitionWidget
@@ -33,6 +33,12 @@ class TrainView(Screen):
         self.break_timer.reset_timer()
         self.break_timer.remove_class("hide")
 
+    def update_progress(self) -> None:
+        self.completed_exercises += 1
+        self.progress_bar.update(
+            progress=(self.completed_exercises / self.total_exercises) * 100
+        )
+
     def handle_next_exercise(self):
         self._remove_train_widgets()
         e = next(self.exercise_iter, None)
@@ -41,7 +47,6 @@ class TrainView(Screen):
             # TODO: switch to end screen or notify user?
             return
 
-        self.completed_exercises += 1
         if isinstance(e, DurationExercise):
             timer_widget = Timer(
                 title=e.name,
@@ -55,6 +60,12 @@ class TrainView(Screen):
 
     def compose(self) -> ComposeResult:
         yield Header(classes="no-remove")
+        self.progress_bar = ProgressBar(
+            classes="no-remove",
+            total=100,
+            show_eta=False,
+        )
+        yield self.progress_bar
         BREAK_DURATION = 7  # TODO: in future value from user settings
         self.break_timer = Timer(
             title="Break",
@@ -70,6 +81,7 @@ class TrainView(Screen):
 
     @on(TimeDisplay.Ended, ".exercise-timer TimeDisplay")
     def exercise_timer_ended(self) -> None:
+        self.update_progress()
         self.start_break_timer()
 
     @on(TimeDisplay.Ended, "#break-timer TimeDisplay")
@@ -80,10 +92,12 @@ class TrainView(Screen):
     def on_button_pressed(self, event: Button.Pressed) -> None:
         button_id = event.button.id
         if button_id == "reps-finished":
+            self.update_progress()
             self.start_break_timer()
 
     def action_skip_exercise(self):
         if self.break_timer.has_class("hide"):
+            self.update_progress()
             self.start_break_timer()
         else:
             self.break_timer.add_class("hide")

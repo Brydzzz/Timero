@@ -203,4 +203,10 @@ ReorderWidget {
 
 TrainView {
     align: center middle;
+    layout: vertical;
+
+    & > ProgressBar {
+        height: auto;
+        content-align: center middle;
+    }
 }
