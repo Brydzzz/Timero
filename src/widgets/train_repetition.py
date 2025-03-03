@@ -11,7 +11,7 @@ class TrainRepetitionWidget(VerticalGroup):
         TrainRepetitionWidget {
             background: $boost;
             align: center middle;
-            max-width: 55%;
+            max-width: 55vw;
             max-height: 65vh;
             height: auto;
             margin: 1;

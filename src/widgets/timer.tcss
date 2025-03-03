@@ -1,6 +1,6 @@
 Timer {
     background: $boost;
-    max-width: 55%;
+    max-width: 55vw;
     max-height: 65vh;
     margin: 1;
     padding: 1;
