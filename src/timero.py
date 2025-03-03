@@ -11,7 +11,7 @@ from screens.manager import ScreenManager
 
 class TimeroApp(App):
     CSS_PATH = "timero.tcss"
-    BINDINGS = [("h", "go_home", "Go to homepage")]
+    BINDINGS = [("h", "go_home", "Homepage")]
 
     routines: list[Routine] = reactive(None)
     path = var(Path(__file__).parent.parent / "routines.json")

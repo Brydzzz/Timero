@@ -7,7 +7,7 @@ from widgets.routine_widget import RoutineWidget
 class RoutineViewScreen(Screen):
     """Screen with selected routine"""
 
-    BINDINGS = [("b", "go_back", "Go back to select routine")]
+    BINDINGS = [("b", "go_back", "Back")]
 
     def compose(self):
         yield Header()
