@@ -10,7 +10,7 @@ from widgets.train_repetition import TrainRepetitionWidget
 class TrainView(Screen):
     CSS_PATH = "../widgets/timer.tcss"
 
-    BINDINGS = [("s", "skip_exercise", "Skip Exercise")]
+    BINDINGS = [("s", "skip_exercise", "Skip")]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
