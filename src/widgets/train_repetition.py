@@ -54,20 +54,9 @@ class TrainRepetitionWidget(VerticalGroup):
         }
     """
 
-    def __init__(
-        self, exercise: RepetitionExercise | None = None, *args, **kwargs
-    ):
+    def __init__(self, exercise: RepetitionExercise, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.exercise = exercise or RepetitionExercise(
-            name="Unknown", repetitions=0
-        )
-
-    def change_exercise(self, exercise: RepetitionExercise) -> None:
         self.exercise = exercise
-        self.query_one("#rep-exercise-name", Label).update(self.exercise.name)
-        self.query_one("#repetitions-number", Digits).update(
-            f"{self.exercise.repetitions}"
-        )
 
     def compose(self) -> ComposeResult:
         with Container(id="exercise-name-container"):
