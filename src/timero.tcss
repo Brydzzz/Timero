@@ -203,7 +203,7 @@ ReorderWidget {
 
 TrainView {
     align: center middle;
-    layout: vertical;
+    # layout: vertical;
 }
 
 TrainView ProgressBar {
@@ -216,7 +216,4 @@ TrainView ProgressBar {
     #bar {
         margin-top: 1;
     }
-}
-TrainView Timer {
-    margin-bottom: 0;
 }
