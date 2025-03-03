@@ -27,9 +27,7 @@ class TrainView(Screen):
         self.remove_children(train_widgets)
 
         if isinstance(e, DurationExercise):
-            timer_widget = Timer(
-                title=e.name, duration_time=e.duration, id="exercise-timer"
-            )
+            timer_widget = Timer(title=e.name, duration_time=e.duration)
             self.mount(timer_widget)
         elif isinstance(e, RepetitionExercise):
             train_widget = TrainRepetitionWidget(e)
