@@ -20,7 +20,7 @@ class TimeroApp(App):
     def on_mount(self) -> None:
         self.install_screen(StartScreen(id="start"), name="start")
         self.push_screen("start")
-        self.theme = "dracula"
+        self.theme = "gruvbox"
         self.screen_manager = ScreenManager(self)
 
     def action_go_home(self) -> None:
