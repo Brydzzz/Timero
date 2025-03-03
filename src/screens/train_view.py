@@ -5,6 +5,7 @@ from textual.widgets import Header, Footer, Button, ProgressBar
 from routine import DurationExercise, RepetitionExercise
 from widgets.timer import TimeDisplay, Timer
 from widgets.train_repetition import TrainRepetitionWidget
+from widgets.training_end import TrainingEndWidget
 
 
 class TrainView(Screen):
@@ -26,9 +27,10 @@ class TrainView(Screen):
 
     def start_break_timer(self) -> None:
         if self.total_exercises == self.completed_exercises:
-            self.app.screen_manager.go_to_routine()
-            # TODO: switch to end screen or notify user?
+            self._remove_train_widgets()
+            self.mount(TrainingEndWidget(self.routine.name))
             return
+
         self._remove_train_widgets()
         self.break_timer.reset_timer()
         self.break_timer.remove_class("hide")
@@ -43,8 +45,8 @@ class TrainView(Screen):
         self._remove_train_widgets()
         e = next(self.exercise_iter, None)
         if not e:
-            self.app.screen_manager.go_to_routine()
-            # TODO: switch to end screen or notify user?
+            self._remove_train_widgets()
+            self.mount(TrainingEndWidget(self.routine.name))
             return
 
         if isinstance(e, DurationExercise):
@@ -94,6 +96,8 @@ class TrainView(Screen):
         if button_id == "reps-finished":
             self.update_progress()
             self.start_break_timer()
+        elif button_id == "exit-training":
+            self.app.screen_manager.go_to_routine()
 
     def action_skip_exercise(self):
         if self.break_timer.has_class("hide"):
