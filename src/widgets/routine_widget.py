@@ -235,4 +235,11 @@ class RoutineWidget(HorizontalGroup):
             if self.reorder_input.has_class("hide"):
                 self.reorder_input.remove_class("hide")
         elif button_id == "start-btn":
+            if len(self.controller.routine.exercises) == 0:
+                self.notify(
+                    title="Failed to start routine",
+                    message="Exercise list can't be empty",
+                    severity="error",
+                )
+                return
             self.app.switch_screen(TrainView())
