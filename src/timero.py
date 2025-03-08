@@ -4,9 +4,9 @@ from textual.reactive import reactive, var
 
 
 from routine import Routine
-from screens.start import StartScreen
+from screens.homepage import Homepage
 
-from screens.manager import ScreenManager
+from screens.screen_manager import ScreenManager
 
 
 class TimeroApp(App):
@@ -18,7 +18,7 @@ class TimeroApp(App):
     curr_routine_idx = var(0)
 
     def on_mount(self) -> None:
-        self.install_screen(StartScreen(id="start"), name="start")
+        self.install_screen(Homepage(id="start"), name="start")
         self.push_screen("start")
         self.theme = "gruvbox"
         self.screen_manager = ScreenManager(self)
