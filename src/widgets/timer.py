@@ -117,13 +117,14 @@ class Timer(VerticalGroup):
             id="timer-btn-container",
         )
 
-    # def on_mount(self) -> None:
-    #     self.query_one("#start", Button).focus()
+    def _start_timer_safe(self) -> None:
+        time_display = self.query_one(TimeDisplay)
+        time_display.start()
+        self.add_class("started")
+
+    def start_timer(self) -> None:
+        self.call_after_refresh(self._start_timer_safe)
 
     def reset_timer(self) -> None:
         time_display = self.query_one(TimeDisplay)
         time_display.reset()
-
-    def update_title(self, new_title: str):
-        label = self.query_one("#timer-title", Label)
-        label.update(new_title)
