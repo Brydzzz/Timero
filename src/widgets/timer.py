@@ -7,6 +7,10 @@ from textual.widgets import Button, Digits, Label
 from textual.message import Message
 
 
+TIMER_END_SOUND = "timer-end-sound.wav"
+TIMER_START_SOUND = "timer-start-sound.wav"
+
+
 class TimeDisplay(Digits):
     """A widget to display elapsed time."""
 
@@ -21,7 +25,6 @@ class TimeDisplay(Digits):
 
         def __init__(self, time_display: "TimeDisplay") -> None:
             self.time_display: TimeDisplay = time_display
-            """The button that was pressed."""
             super().__init__()
 
         @property
@@ -40,7 +43,6 @@ class TimeDisplay(Digits):
         return f"{hours:02,.0f}:{minutes:02.0f}:{seconds:05.2f}"
 
     def on_mount(self) -> None:
-        """Event handler called when widget is added to the app."""
         self.update_timer = self.set_interval(
             1 / 60, self.update_time, pause=True
         )
@@ -57,6 +59,7 @@ class TimeDisplay(Digits):
         if time == 0.0:
             self.update_timer.pause()
             self.parent.remove_class("started")
+            self.app.sound_manager.play_sound(TIMER_END_SOUND)
             self.post_message(TimeDisplay.Ended(self))
         self.update(self._format_time(time))
 
@@ -64,6 +67,7 @@ class TimeDisplay(Digits):
         """Method to start (or resume) time updating."""
         self.start_time = monotonic()
         self.update_timer.resume()
+        self.app.sound_manager.play_sound(TIMER_START_SOUND)
 
     def stop(self) -> None:
         """Method to stop the time display updating."""
@@ -92,7 +96,6 @@ class Timer(VerticalGroup):
         time_display.time_to_display = self.duration_time
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        """Event handler called when a button is pressed."""
         button_id = event.button.id
         time_display = self.query_one(TimeDisplay)
         if button_id == "start":
@@ -105,7 +108,6 @@ class Timer(VerticalGroup):
             time_display.reset()
 
     def compose(self) -> ComposeResult:
-        """Create child widgets of a timer."""
         yield Container(
             Label(self.title, id="timer-title"), id="title-container"
         )
