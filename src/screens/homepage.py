@@ -5,8 +5,8 @@ from textual.containers import HorizontalGroup
 from routine import load_routines
 
 
-class StartScreen(Screen):
-    """Start screen for the app"""
+class Homepage(Screen):
+    """Homepage for the app"""
 
     BINDINGS = [
         ("l", "load_routine", "Load routines"),

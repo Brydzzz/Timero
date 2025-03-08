@@ -22,8 +22,8 @@ Select {
 }
 
 
-# Start Screen
-StartScreen {
+# Homepage
+Homepage {
     align: center middle;
 }
 
