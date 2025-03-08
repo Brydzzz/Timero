@@ -17,7 +17,7 @@ class Homepage(Screen):
         yield Header()
         yield Footer()
         yield HorizontalGroup(
-            Button("Load Routine", id="load-btn"),
+            Button("Load Routines", id="load-btn"),
             Button("Create Routine", id="create-btn"),
             id="start-btns",
         )
