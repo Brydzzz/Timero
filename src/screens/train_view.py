@@ -23,7 +23,7 @@ class TrainView(Screen):
         self.total_exercises = len(self.routine.exercises)
         self.show_breaks = True  # TODO user setting
         self.auto_start_breaks = True  # TODO user setting
-        self.auto_start_exercises = False  # TODO user setting
+        self.auto_start_exercises = True  # TODO user setting
         self.break_duration = 7  # TODO: in future value from user settings
         self.completed_exercises = 0
 
@@ -41,6 +41,8 @@ class TrainView(Screen):
         self.break_timer.reset_timer()
         self.break_timer.remove_class("hide")
         self.is_in_break = True
+        if self.auto_start_breaks:
+            self.break_timer.start_timer()
 
     def _update_progress_bar(self) -> None:
         progress_percent = (
@@ -60,6 +62,8 @@ class TrainView(Screen):
                 classes="exercise-timer",
             )
             self.mount(timer_widget)
+            if self.auto_start_exercises:
+                timer_widget.start_timer()
         elif isinstance(e, RepetitionExercise):
             train_widget = TrainRepetitionWidget(e)
             self.mount(train_widget)
@@ -89,7 +93,7 @@ class TrainView(Screen):
             self._update_progress_bar()
             self._show_training_end()
             return
-        
+
         if self.show_breaks:
             if self.is_in_break:
                 self.break_timer.add_class("hide")
