@@ -7,6 +7,7 @@ from routine import Routine
 from screens.homepage import Homepage
 
 from screens.screen_manager import ScreenManager
+from sound_manager import SoundManager
 
 
 class TimeroApp(App):
@@ -22,9 +23,15 @@ class TimeroApp(App):
         self.push_screen("start")
         self.theme = "gruvbox"
         self.screen_manager = ScreenManager(self)
+        self.sound_manager = SoundManager(
+            Path(__file__).parent.parent / "assets" / "audio"
+        )
 
     def action_go_home(self) -> None:
         self.app.switch_screen("start")
+
+    def on_exit(self):
+        self.sound_manager.quit()
 
 
 if __name__ == "__main__":
