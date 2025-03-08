@@ -2,6 +2,7 @@ from textual import on
 from textual.screen import Screen
 from textual.app import ComposeResult
 from textual.widgets import Header, Footer, Button, ProgressBar
+from textual.reactive import reactive
 from routine import DurationExercise, RepetitionExercise
 from widgets.timer import TimeDisplay, Timer
 from widgets.train_repetition import TrainRepetitionWidget
@@ -13,11 +14,17 @@ class TrainView(Screen):
 
     BINDINGS = [("s", "skip_exercise", "Skip")]
 
+    is_in_break = reactive(False)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.routine = self.app.routines[self.app.curr_routine_idx]
         self.exercise_iter = iter(self.routine.exercises)
         self.total_exercises = len(self.routine.exercises)
+        self.show_breaks = True  # TODO user setting
+        self.auto_start_breaks = True  # TODO user setting
+        self.auto_start_exercises = False  # TODO user setting
+        self.break_duration = 7  # TODO: in future value from user settings
         self.completed_exercises = 0
 
     def _remove_train_widgets(self) -> None:
@@ -25,29 +32,26 @@ class TrainView(Screen):
         train_widgets = children.exclude(".no-remove")
         self.remove_children(train_widgets)
 
-    def start_break_timer(self) -> None:
-        if self.total_exercises == self.completed_exercises:
-            self._remove_train_widgets()
-            self.mount(TrainingEndWidget(self.routine.name))
-            return
+    def _show_training_end(self) -> None:
+        self._remove_train_widgets()
+        self.mount(TrainingEndWidget(self.routine.name))
 
+    def _start_break_timer(self) -> None:
         self._remove_train_widgets()
         self.break_timer.reset_timer()
         self.break_timer.remove_class("hide")
+        self.is_in_break = True
 
-    def update_progress(self) -> None:
-        self.completed_exercises += 1
-        self.progress_bar.update(
-            progress=(self.completed_exercises / self.total_exercises) * 100
-        )
+    def _update_progress_bar(self) -> None:
+        progress_percent = (
+            self.completed_exercises / self.total_exercises
+        ) * 100
+        self.progress_bar.update(progress=progress_percent)
 
-    def handle_next_exercise(self):
+    def _show_next_exercise(self):
         self._remove_train_widgets()
         e = next(self.exercise_iter, None)
-        if not e:
-            self._remove_train_widgets()
-            self.mount(TrainingEndWidget(self.routine.name))
-            return
+        self.is_in_break = False
 
         if isinstance(e, DurationExercise):
             timer_widget = Timer(
@@ -68,10 +72,9 @@ class TrainView(Screen):
             show_eta=False,
         )
         yield self.progress_bar
-        BREAK_DURATION = 7  # TODO: in future value from user settings
         self.break_timer = Timer(
             title="Break",
-            duration_time=BREAK_DURATION,
+            duration_time=self.break_duration,
             id="break-timer",
             classes="no-remove hide",
         )
@@ -79,30 +82,46 @@ class TrainView(Screen):
         yield Footer(classes="no-remove")
 
     def on_mount(self) -> None:
-        self.handle_next_exercise()
+        self._show_next_exercise()
+
+    def choose_next_action(self):
+        if self.completed_exercises == self.total_exercises:
+            self._update_progress_bar()
+            self._show_training_end()
+            return
+        
+        if self.show_breaks:
+            if self.is_in_break:
+                self.break_timer.add_class("hide")
+                self._show_next_exercise()
+            else:
+                self._update_progress_bar()
+                self._start_break_timer()
+        else:
+            self._update_progress_bar()
+            self._show_next_exercise()
 
     @on(TimeDisplay.Ended, ".exercise-timer TimeDisplay")
     def exercise_timer_ended(self) -> None:
-        self.update_progress()
-        self.start_break_timer()
+        self.completed_exercises += 1
+        self.choose_next_action()
 
     @on(TimeDisplay.Ended, "#break-timer TimeDisplay")
     def break_timer_ended(self) -> None:
-        self.break_timer.add_class("hide")
-        self.handle_next_exercise()
+        self.choose_next_action()
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         button_id = event.button.id
         if button_id == "reps-finished":
-            self.update_progress()
-            self.start_break_timer()
+            self.completed_exercises += 1
+            self.choose_next_action()
         elif button_id == "exit-training":
             self.app.screen_manager.go_to_routine()
 
     def action_skip_exercise(self):
-        if self.break_timer.has_class("hide"):
-            self.update_progress()
-            self.start_break_timer()
-        else:
-            self.break_timer.add_class("hide")
-            self.handle_next_exercise()
+        if (
+            not self.is_in_break
+            and self.completed_exercises != self.total_exercises
+        ):
+            self.completed_exercises += 1
+        self.choose_next_action()
