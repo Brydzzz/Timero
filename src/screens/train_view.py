@@ -21,10 +21,12 @@ class TrainView(Screen):
         self.routine = self.app.routines[self.app.curr_routine_idx]
         self.exercise_iter = iter(self.routine.exercises)
         self.total_exercises = len(self.routine.exercises)
-        self.show_breaks = True  # TODO user setting
-        self.auto_start_breaks = True  # TODO user setting
-        self.auto_start_exercises = True  # TODO user setting
-        self.break_duration = 7  # TODO: in future value from user settings
+        self.show_breaks = self.app.settings.get("show_breaks")
+        self.auto_start_breaks = self.app.settings.get("auto_start_breaks")
+        self.auto_start_exercises = self.app.settings.get(
+            "auto_start_exercises"
+        )
+        self.break_duration = self.app.settings.get("break_duration")
         self.completed_exercises = 0
 
     def _remove_train_widgets(self) -> None:

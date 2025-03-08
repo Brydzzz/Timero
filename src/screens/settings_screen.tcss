@@ -1,0 +1,27 @@
+
+SettingsScreen {
+    align: center middle;
+}
+
+.settings-item-container {
+    margin: 2;
+    background: $boost;
+    width: auto;
+    height: 5;
+    padding: 0 2;
+}
+
+.setting-label {
+    margin: 1 4 1 1;
+    text-align: left;
+}
+
+#break-duration-input {
+    width: auto;
+}
+
+
+#reset-settings {
+    width: auto;
+    padding: 0 1;
+}
