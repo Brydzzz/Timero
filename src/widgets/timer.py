@@ -127,6 +127,10 @@ class Timer(VerticalGroup):
     def start_timer(self) -> None:
         self.call_after_refresh(self._start_timer_safe)
 
+    def stop_timer(self) -> None:
+        time_display = self.query_one(TimeDisplay)
+        time_display.stop()
+
     def reset_timer(self) -> None:
         time_display = self.query_one(TimeDisplay)
         time_display.reset()

@@ -3,6 +3,7 @@ from textual.screen import Screen
 from textual.app import ComposeResult
 from textual.widgets import Header, Footer, Button, ProgressBar
 from textual.reactive import reactive
+from textual.css.query import NoMatches
 from routine import DurationExercise, RepetitionExercise
 from widgets.timer import TimeDisplay, Timer
 from widgets.train_repetition import TrainRepetitionWidget
@@ -130,4 +131,12 @@ class TrainView(Screen):
             and self.completed_exercises != self.total_exercises
         ):
             self.completed_exercises += 1
+
+        if self.is_in_break:
+            self.break_timer.stop_timer()
+        try:
+            self.query_one(".exercise-timer", Timer).stop_timer()
+        except NoMatches:
+            pass
+
         self.choose_next_action()
