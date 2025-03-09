@@ -19,9 +19,9 @@ class TrainView(Screen):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.routine = self.app.routines[self.app.curr_routine_idx]
-        self.exercise_iter = iter(self.routine.exercises)
-        self.total_exercises = len(self.routine.exercises)
+        exercises = self.app.routine_controller.get_exercises()
+        self.exercise_iter = iter(exercises)
+        self.total_exercises = len(exercises)
         self.show_breaks = self.app.settings.get("show_breaks")
         self.auto_start_breaks = self.app.settings.get("auto_start_breaks")
         self.auto_start_exercises = self.app.settings.get(
@@ -37,7 +37,9 @@ class TrainView(Screen):
 
     def _show_training_end(self) -> None:
         self._remove_train_widgets()
-        self.mount(TrainingEndWidget(self.routine.name))
+        self.mount(
+            TrainingEndWidget(self.app.routine_controller.get_routine_name())
+        )
 
     def _start_break_timer(self) -> None:
         self._remove_train_widgets()

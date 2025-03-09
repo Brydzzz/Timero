@@ -2,7 +2,6 @@ from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.widgets import Header, Footer, Button
 from textual.containers import HorizontalGroup
-from routine import load_routines
 
 
 class Homepage(Screen):
@@ -30,5 +29,5 @@ class Homepage(Screen):
             pass
 
     def action_load_routine(self) -> None:
-        self.app.routines = load_routines(self.app.path)
+        self.app.routines = self.app.routine_controller.load_routines()
         self.app.screen_manager.go_to_routine_select()

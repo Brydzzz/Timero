@@ -9,8 +9,6 @@ from widgets.time_masked_input import TimeMaskedInput
 from routine import (
     DurationExercise,
     RepetitionExercise,
-    Routine,
-    save_routines,
 )
 from utils.time_strings import duration_input_to_seconds
 from validators import IsEmptyValidator
@@ -27,7 +25,7 @@ class ExerciseInputWidget(HorizontalGroup):
         else:  # REPETITION_OPTION
             return all([self.e_name.is_valid, self.rep_input.is_valid])
 
-    def _create_exercise(self) -> None:
+    def _create_exercise_from_input(self) -> None:
         if self.e_type.value == DURATION_OPTION:
             new_exercise = DurationExercise(
                 self.e_name.value,
@@ -84,16 +82,14 @@ class ExerciseInputWidget(HorizontalGroup):
             )
             return
 
-        new_exercise = self._create_exercise()
+        new_exercise = self._create_exercise_from_input()
 
         new_widget = ListItem(create_exercise_widget(new_exercise))
         self.parent.query_one("#exercises-scroll").mount(new_widget)
         new_widget.scroll_visible()
 
-        routine: Routine = self.app.routines[self.app.curr_routine_idx]
-        routine.add_exercise(new_exercise)
+        self.app.routine_controller.add_exercise(new_exercise)
 
-        save_routines(self.app.path, self.app.routines)
         self.add_class("hide")
 
     @on(Button.Pressed, "#save-exercise-edit-btn")
@@ -108,7 +104,6 @@ class ExerciseInputWidget(HorizontalGroup):
             return
 
         e = self.parent.exercise_to_edit
-        routine: Routine = self.app.routines[self.app.curr_routine_idx]
 
         if isinstance(e, DurationExercise) and self.e_type == DURATION_OPTION:
             e.name = self.e_name.value
@@ -120,8 +115,8 @@ class ExerciseInputWidget(HorizontalGroup):
             e.name = self.e_name.value
             e.repetitions = int(self.rep_input.value)
         else:  # Exercise type changed
-            new_exercise = self._create_exercise()
-            routine.replace_exercise(
+            new_exercise = self._create_exercise_from_input()
+            self.app.routine_controller.replace_exercise(
                 new_exercise, self.parent.exercise_to_edit_idx
             )
             e = new_exercise
@@ -131,7 +126,6 @@ class ExerciseInputWidget(HorizontalGroup):
         new_exercise_widget = create_exercise_widget(e)
         self.parent.exercise_to_edit_widget.mount(new_exercise_widget)
 
-        save_routines(self.app.path, self.app.routines)
         self.add_class("hide")
 
     @on(Button.Pressed, "#cancel-btn")

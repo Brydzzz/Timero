@@ -1,6 +1,7 @@
 from textual import on
 from textual.app import ComposeResult
 from textual.containers import HorizontalGroup
+
 from textual.reactive import reactive
 from textual.widgets import (
     Button,
@@ -13,8 +14,6 @@ from routine import (
     DurationExercise,
     Exercise,
     RepetitionExercise,
-    Routine,
-    save_routines,
 )
 
 
@@ -25,20 +24,6 @@ from widgets.exercise_input import (
     ExerciseInputWidget,
 )
 from widgets.exercises import create_exercise_widget
-
-
-class RoutineController:
-    def __init__(self, app):
-        self.app = app
-        self.routine = self.app.routines[self.app.curr_routine_idx]
-
-    def save_routine(self, reordered_exercises):
-        self.routine.exercises = reordered_exercises
-        save_routines(self.app.path, self.app.routines)
-
-    def remove_exercise(self, index):
-        self.routine.exercises.pop(index)
-        save_routines(self.app.path, self.app.routines)
 
 
 class ReorderWidget(HorizontalGroup):
@@ -75,7 +60,7 @@ class ReorderWidget(HorizontalGroup):
             exercise = list_item.children[0].exercise
             reordered_exercises.append(exercise)
 
-        self.parent.controller.save_routine(reordered_exercises)
+        self.app.routine_controller.reorder_exercises(reordered_exercises)
 
     def _reset_exercise_list(self):
         e_list: ListView = self.parent.e_list
@@ -83,7 +68,7 @@ class ReorderWidget(HorizontalGroup):
         e_list.extend(
             [
                 ListItem(create_exercise_widget(e))
-                for e in self.parent.controller.routine.exercises
+                for e in self.app.routine_controller.get_exercises()
             ]
         )
 
@@ -132,13 +117,10 @@ class RoutineWidget(HorizontalGroup):
         ("e", "edit_exercise", "Edit Exercise"),
     ]
 
+    # Accessed by exercise input
     exercise_to_edit: DurationExercise | RepetitionExercise = reactive(None)
     exercise_to_edit_idx: int = reactive(None)
     exercise_to_edit_widget = reactive(None)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.controller = RoutineController(self.app)
 
     def _show_exercise_form(
         self,
@@ -164,7 +146,7 @@ class RoutineWidget(HorizontalGroup):
     def compose(self) -> ComposeResult:
         yield HorizontalGroup(
             Label(
-                self.controller.routine.name,
+                self.app.routine_controller.get_routine_name(),
                 classes="routine-name",
             ),
             HorizontalGroup(
@@ -177,10 +159,11 @@ class RoutineWidget(HorizontalGroup):
 
         self.e_input = ExerciseInputWidget(id="exercise-input", classes="hide")
         yield self.e_input
+
         self.e_list = ListView(
             *[
                 ListItem(create_exercise_widget(e))
-                for e in self.controller.routine.exercises
+                for e in self.app.routine_controller.get_exercises()
             ],
             id="exercises-scroll",
         )
@@ -195,7 +178,7 @@ class RoutineWidget(HorizontalGroup):
     def action_remove_exercise(self) -> None:
         selected_item = self.e_list.highlighted_child
 
-        if selected_item is None or not self.e_list.has_focus:
+        if not (selected_item and self.e_list.has_focus):
             self.app.notify(
                 message="Please select an exercise first.",
                 title="Cannot Remove Exercise",
@@ -204,7 +187,7 @@ class RoutineWidget(HorizontalGroup):
             return
 
         self.e_list.remove_children([selected_item])
-        self.controller.remove_exercise(self.e_list.index)
+        self.app.routine_controller.remove_exercise(self.e_list.index)
 
     def action_edit_exercise(self) -> None:
         selected_item = self.e_list.highlighted_child
@@ -217,8 +200,7 @@ class RoutineWidget(HorizontalGroup):
             )
             return
 
-        routine: Routine = self.app.routines[self.app.curr_routine_idx]
-        e = routine.exercises[self.e_list.index]
+        e = self.app.routine_controller.get_exercises()[self.e_list.index]
         self.exercise_to_edit = e
         self.exercise_to_edit_idx = self.e_list.index
         self.exercise_to_edit_widget = selected_item
@@ -245,7 +227,7 @@ class RoutineWidget(HorizontalGroup):
             if self.reorder_input.has_class("hide"):
                 self.reorder_input.remove_class("hide")
         elif button_id == "start-btn":
-            if len(self.controller.routine.exercises) == 0:
+            if len(self.app.routine_controller.get_exercises()) == 0:
                 self.notify(
                     title="Failed to start routine",
                     message="Exercise list can't be empty",

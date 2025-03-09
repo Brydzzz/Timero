@@ -4,6 +4,7 @@ from textual.reactive import reactive, var
 
 
 from routine import Routine
+from routine_controller import RoutineController
 from screens.homepage import Homepage
 
 from screens.screen_manager import ScreenManager
@@ -20,8 +21,7 @@ class TimeroApp(App):
     ]
 
     routines: list[Routine] = reactive(None)
-    path = var(Path(__file__).parent.parent / "routines.json")
-    curr_routine_idx = var(0)
+    routines_path = var(Path(__file__).parent.parent / "routines.json")
 
     def on_mount(self) -> None:
         self.install_screen(Homepage(id="homepage"), name="homepage")
@@ -33,6 +33,7 @@ class TimeroApp(App):
             Path(__file__).parent.parent / "assets" / "audio"
         )
         self.settings = Settings(Path(__file__).parent.parent / "config.json")
+        self.routine_controller = RoutineController(self)
 
     def action_go_home(self) -> None:
         self.app.switch_screen("homepage")

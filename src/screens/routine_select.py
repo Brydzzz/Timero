@@ -18,7 +18,6 @@ class RoutinesSelectScreen(Screen):
         yield lv
 
     def on_list_view_selected(self, event: ListView.Selected) -> None:
-        """Event handler called when list item is selected."""
         idx = int(event.item.name)
-        self.app.curr_routine_idx = idx
+        self.app.routine_controller.set_routine(self.app.routines[idx])
         self.app.screen_manager.go_to_routine()
