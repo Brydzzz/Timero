@@ -1,3 +1,4 @@
+from textual import on
 from textual.app import ComposeResult
 from textual.containers import HorizontalGroup
 from textual.reactive import reactive
@@ -86,33 +87,41 @@ class ReorderWidget(HorizontalGroup):
             ]
         )
 
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        button_id = event.button.id
-        match button_id:
-            case "move-up":
-                index, e = self._get_exercise_to_move()
-                if index > 0:
-                    self._move_exercise(index, index - 1, e)
-            case "move-top":
-                index, e = self._get_exercise_to_move()
-                if index != 0:
-                    self._move_exercise(index, 0, e)
-            case "move-down":
-                index, e = self._get_exercise_to_move()
-                e_list: ListView = self.parent.e_list
-                if index < len(e_list.children) - 1:
-                    self._move_exercise(index, index + 2, e)
-            case "move-bottom":
-                index, e = self._get_exercise_to_move()
-                length = len(self.parent.e_list.children)
-                if index != length - 1:
-                    self._move_exercise(index, length, e)
-            case "save-reorder":
-                self._save_reordered_exercises()
-                self.add_class("hide")
-            case "cancel-reorder":
-                self._reset_exercise_list()
-                self.add_class("hide")
+    @on(Button.Pressed, "#move-up")
+    def move_exercise_one_up(self):
+        index, e = self._get_exercise_to_move()
+        if index > 0:
+            self._move_exercise(index, index - 1, e)
+
+    @on(Button.Pressed, "#move-top")
+    def move_exercise_to_the_top(self):
+        index, e = self._get_exercise_to_move()
+        if index != 0:
+            self._move_exercise(index, 0, e)
+
+    @on(Button.Pressed, "#move-down")
+    def move_exercise_one_down(self):
+        index, e = self._get_exercise_to_move()
+        e_list: ListView = self.parent.e_list
+        if index < len(e_list.children) - 1:
+            self._move_exercise(index, index + 2, e)
+
+    @on(Button.Pressed, "#move-bottom")
+    def move_exercise_to_the_bottom(self):
+        index, e = self._get_exercise_to_move()
+        length = len(self.parent.e_list.children)
+        if index != length - 1:
+            self._move_exercise(index, length, e)
+
+    @on(Button.Pressed, "#save-reorder")
+    def save_reorder(self):
+        self._save_reordered_exercises()
+        self.add_class("hide")
+
+    @on(Button.Pressed, "#cancel-reorder")
+    def cancel_reorder(self):
+        self._reset_exercise_list()
+        self.add_class("hide")
 
 
 class RoutineWidget(HorizontalGroup):
@@ -230,6 +239,7 @@ class RoutineWidget(HorizontalGroup):
             )
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
+        # TODO disable buttons when empty exercise list
         button_id = event.button.id
         if button_id == "reorder-btn":
             if self.reorder_input.has_class("hide"):
