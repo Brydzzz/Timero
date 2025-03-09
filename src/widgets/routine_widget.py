@@ -221,9 +221,15 @@ class RoutineWidget(HorizontalGroup):
             )
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        # TODO disable buttons when empty exercise list
         button_id = event.button.id
         if button_id == "reorder-btn":
+            if len(self.app.routine_controller.get_exercises()) == 0:
+                self.notify(
+                    title="Failed to reorder routine's exercises",
+                    message="Exercise list can't be empty",
+                    severity="error",
+                )
+                return
             if self.reorder_input.has_class("hide"):
                 self.reorder_input.remove_class("hide")
         elif button_id == "start-btn":
