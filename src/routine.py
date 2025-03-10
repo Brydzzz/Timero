@@ -2,13 +2,14 @@ import json
 
 
 class Exercise:
-    def __init__(self, name: str):
+    def __init__(self, name: str, type: str):
         self.name = name
+        self.type = type
 
 
 class DurationExercise(Exercise):
     def __init__(self, name: str, duration: int):
-        super().__init__(name)
+        super().__init__(name, type="duration")
         self.duration = duration
 
     def duration_mask_string(self) -> str:
@@ -24,7 +25,7 @@ class DurationExercise(Exercise):
 
 class RepetitionExercise(Exercise):
     def __init__(self, name: str, repetitions: int):
-        super().__init__(name)
+        super().__init__(name, type="repetition")
         self.repetitions = repetitions
 
 

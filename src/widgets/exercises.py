@@ -1,7 +1,7 @@
 from textual.app import ComposeResult
 from textual.containers import HorizontalGroup
 from textual.widgets import Label
-from routine import DurationExercise, RepetitionExercise, Exercise
+from routine import Exercise
 
 from utils.time_strings import (
     repetitions_to_str,
@@ -50,7 +50,7 @@ class RepetitionExerciseWidget(ExerciseWidget):
 
 
 def create_exercise_widget(e: Exercise) -> ExerciseWidget:
-    if isinstance(e, DurationExercise):
+    if e.type == "duration":
         return DurationExerciseWidget(e, e.name, e.duration)
-    elif isinstance(e, RepetitionExercise):
+    elif e.type == "repetition":
         return RepetitionExerciseWidget(e, e.name, e.repetitions)

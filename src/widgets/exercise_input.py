@@ -105,13 +105,10 @@ class ExerciseInputWidget(HorizontalGroup):
 
         e = self.parent.exercise_to_edit
 
-        if isinstance(e, DurationExercise) and self.e_type == DURATION_OPTION:
+        if e.type == "duration" and self.e_type == DURATION_OPTION:
             e.name = self.e_name.value
             e.duration = duration_input_to_seconds(self.duration_input.value)
-        elif (
-            isinstance(e, RepetitionExercise)
-            and self.e_type == REPETITION_OPTION
-        ):
+        elif e.type == "repetition" and self.e_type == REPETITION_OPTION:
             e.name = self.e_name.value
             e.repetitions = int(self.rep_input.value)
         else:  # Exercise type changed

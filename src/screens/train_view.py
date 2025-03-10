@@ -4,7 +4,6 @@ from textual.app import ComposeResult
 from textual.widgets import Header, Footer, Button, ProgressBar
 from textual.reactive import reactive
 from textual.css.query import NoMatches
-from routine import DurationExercise, RepetitionExercise
 from widgets.timer import TimeDisplay, Timer
 from widgets.train_repetition import TrainRepetitionWidget
 from widgets.training_end import TrainingEndWidget
@@ -60,7 +59,7 @@ class TrainView(Screen):
         e = next(self.exercise_iter, None)
         self.is_in_break = False
 
-        if isinstance(e, DurationExercise):
+        if e.type == "duration":
             timer_widget = Timer(
                 title=e.name,
                 duration_time=e.duration,
@@ -69,7 +68,7 @@ class TrainView(Screen):
             self.mount(timer_widget)
             if self.auto_start_exercises:
                 timer_widget.start_timer()
-        elif isinstance(e, RepetitionExercise):
+        elif e.type == "repetition":
             train_widget = TrainRepetitionWidget(e)
             self.mount(train_widget)
 

@@ -205,14 +205,14 @@ class RoutineWidget(HorizontalGroup):
         self.exercise_to_edit_idx = self.e_list.index
         self.exercise_to_edit_widget = selected_item
 
-        if isinstance(e, DurationExercise):
+        if e.type == "duration":
             self._show_exercise_form(
                 name=e.name,
                 duration=e.duration_mask_string(),
                 type=DURATION_OPTION,
                 editing=True,
             )
-        elif isinstance(e, RepetitionExercise):
+        elif e.type == "repetition":
             self._show_exercise_form(
                 name=e.name,
                 rep=str(e.repetitions),
