@@ -6,8 +6,8 @@ from typing import Any
 class Settings:
     DEFAULT_SETTINGS = {
         "show_breaks": True,
-        "auto_start_breaks": False,
-        "auto_start_exercises": False,
+        "auto_start_breaks": True,
+        "auto_start_exercises": True,
         "break_duration": 10,
     }
 
