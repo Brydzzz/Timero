@@ -8,6 +8,7 @@ from textual.widgets import (
     Label,
     ListView,
     ListItem,
+    Input,
 )
 
 from routine import (
@@ -18,6 +19,7 @@ from routine import (
 
 
 from screens.train_view import TrainView
+from validators import IsEmptyValidator
 from widgets.exercise_input import (
     DURATION_OPTION,
     REPETITION_OPTION,
@@ -61,6 +63,9 @@ class ReorderWidget(HorizontalGroup):
             reordered_exercises.append(exercise)
 
         self.app.routine_controller.reorder_exercises(reordered_exercises)
+
+        if not self.parent.create_mode:
+            self.app.routine_controller.save_routines()
 
     def _reset_exercise_list(self):
         e_list: ListView = self.parent.e_list
@@ -122,6 +127,12 @@ class RoutineWidget(HorizontalGroup):
     exercise_to_edit_idx: int = reactive(None)
     exercise_to_edit_widget = reactive(None)
 
+    def __init__(self, create_mode: bool = False, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.create_mode = create_mode
+        if self.create_mode:
+            self.app.routine_controller.create_and_set_new_routine()
+
     def _clear_exercise_form(self) -> None:
         self.e_input.e_name.value = ""
         self.e_input.duration_input.value = ""
@@ -161,18 +172,38 @@ class RoutineWidget(HorizontalGroup):
         self.e_input.e_name.focus()
 
     def compose(self) -> ComposeResult:
-        yield HorizontalGroup(
-            Label(
-                self.app.routine_controller.get_routine_name(),
-                classes="routine-name",
-            ),
-            HorizontalGroup(
-                Button("Start", id="start-btn"),
-                Button("Reorder", id="reorder-btn"),
-                classes="routine-actions",
-            ),
-            classes="routine-header",
-        )
+        if self.create_mode:
+            self.routine_name_input = Input(
+                placeholder="Enter routine name",
+                value=self.app.routine_controller.get_routine_name(),
+                type="text",
+                id="routine-name-input",
+                validators=[IsEmptyValidator()],
+            )
+            self.routine_name_input.border_title = "Routine Name"
+            yield HorizontalGroup(
+                self.routine_name_input,
+                HorizontalGroup(
+                    Button("Save", id="save-routine"),
+                    Button("Reorder", id="reorder-btn"),
+                    Button("Cancel", id="cancel-routine-creation"),
+                    classes="create-routine-actions",
+                ),
+                classes="create-routine-header",
+            )
+        else:
+            yield HorizontalGroup(
+                Label(
+                    self.app.routine_controller.get_routine_name(),
+                    classes="routine-name",
+                ),
+                HorizontalGroup(
+                    Button("Start", id="start-btn"),
+                    Button("Reorder", id="reorder-btn"),
+                    classes="routine-actions",
+                ),
+                classes="routine-header",
+            )
 
         self.e_input = ExerciseInputWidget(id="exercise-input", classes="hide")
         yield self.e_input
@@ -184,6 +215,7 @@ class RoutineWidget(HorizontalGroup):
             ],
             id="exercises-scroll",
         )
+        self.e_list.border_title = "Exercises:"
         yield self.e_list
 
         self.reorder_input = ReorderWidget(classes="hide")
@@ -205,6 +237,8 @@ class RoutineWidget(HorizontalGroup):
 
         self.e_list.remove_children([selected_item])
         self.app.routine_controller.remove_exercise(self.e_list.index)
+        if not self.create_mode:
+            self.app.routine_controller.save_routines()
 
     def action_edit_exercise(self) -> None:
         selected_item = self.e_list.highlighted_child
@@ -244,3 +278,32 @@ class RoutineWidget(HorizontalGroup):
                 )
                 return
             self.app.switch_screen(TrainView())
+        elif button_id == "cancel-routine-creation":
+            self.app.switch_screen("homepage")
+            self.app.routine_controller.unset_routine()
+        elif button_id == "save-routine":
+            if self.routine_name_input.is_valid:
+                name = self.routine_name_input.value
+                success = self.app.routine_controller.set_routine_name(name)
+                if success:
+                    self.app.routine_controller.add_routine_to_app_routines()
+                    self.app.routine_controller.save_routines()
+                    self.notify(
+                        title="Created new routine",
+                        message="Check it out in list of routines",
+                        severity="information",
+                    )
+                    self.app.switch_screen("homepage")
+                    self.app.routine_controller.unset_routine()
+                else:
+                    self.notify(
+                        title="Cannot create routine",
+                        message="Routine name is taken",
+                        severity="error",
+                    )
+            else:
+                self.notify(
+                    title="Cannot create routine",
+                    message="Routine name cannot be empty",
+                    severity="error",
+                )

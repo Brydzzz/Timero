@@ -89,6 +89,8 @@ class ExerciseInputWidget(HorizontalGroup):
         new_widget.scroll_visible()
 
         self.app.routine_controller.add_exercise(new_exercise)
+        if not self.parent.create_mode:
+            self.app.routine_controller.save_routines()
 
         self.add_class("hide")
 
@@ -113,15 +115,20 @@ class ExerciseInputWidget(HorizontalGroup):
             e.repetitions = int(self.rep_input.value)
         else:  # Exercise type changed
             new_exercise = self._create_exercise_from_input()
+
             self.app.routine_controller.replace_exercise(
                 new_exercise, self.parent.exercise_to_edit_idx
             )
+
             e = new_exercise
 
         # Update widget
         self.parent.exercise_to_edit_widget.remove_children()
         new_exercise_widget = create_exercise_widget(e)
         self.parent.exercise_to_edit_widget.mount(new_exercise_widget)
+
+        if not self.parent.create_mode:
+            self.app.routine_controller.save_routines()
 
         self.add_class("hide")
 
