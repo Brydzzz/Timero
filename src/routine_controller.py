@@ -25,6 +25,19 @@ class RoutineController:
     def set_routine(self, routine: Routine) -> None:
         self.routine = routine
 
+    def unset_routine(self) -> None:
+        self.routine = None
+
+    def set_routine_name(self, routine_name: Routine) -> bool:
+        if self.check_if_routine_exists(routine_name):
+            return False
+        else:
+            self.routine.name = routine_name
+            return True
+
+    def add_routine_to_app_routines(self):
+        self.app.routines.append(self.routine)
+
     def get_routine_name(self) -> str:
         return self.routine.name
 
@@ -53,7 +66,7 @@ class RoutineController:
         if self.routine:
             self.routine.exercises = new_order
 
-    def load_routines(self):
+    def load_routines(self) -> list[Routine]:
         from routine import load_routines
 
         return load_routines(self.app.routines_path)
