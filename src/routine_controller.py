@@ -69,7 +69,11 @@ class RoutineController:
     def load_routines(self) -> list[Routine]:
         from routine import load_routines
 
-        return load_routines(self.app.routines_path)
+        if not self.app.routines_path.exists():
+            open(self.app.routines_path, "w").close()
+            return []
+        else:
+            return load_routines(self.app.routines_path)
 
     def save_routines(self):
         from routine import save_routines
