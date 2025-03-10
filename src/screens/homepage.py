@@ -3,12 +3,14 @@ from textual.screen import Screen
 from textual.widgets import Header, Footer, Button
 from textual.containers import HorizontalGroup
 
+from screens.create_routine import CreateRoutineView
+
 
 class Homepage(Screen):
     """Homepage for the app"""
 
     BINDINGS = [
-        ("l", "load_routine", "Load routines"),
+        ("l", "go_to_routines", "List of routines"),
         ("c", "create_routine", "Create new routine"),
     ]
 
@@ -16,21 +18,20 @@ class Homepage(Screen):
         yield Header()
         yield Footer()
         yield HorizontalGroup(
-            Button("Load Routines", id="load-btn"),
+            Button("List Of Routines", id="list-btn"),
             Button("Create Routine", id="create-btn"),
             id="start-btns",
         )
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         button_id = event.button.id
-        if button_id == "load-btn":
-            self.action_load_routine()
+        if button_id == "list-btn":
+            self.action_go_to_routines()
         elif button_id == "create-btn":
             self.action_create_routine()
 
-    def action_load_routine(self) -> None:
-        self.app.routines = self.app.routine_controller.load_routines()
+    def action_go_to_routines(self) -> None:
         self.app.screen_manager.go_to_routine_select()
 
     def action_create_routine(self) -> None:
-        self.app.switch_screen("create-routine")
+        self.app.switch_screen(CreateRoutineView())
