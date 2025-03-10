@@ -4,6 +4,23 @@ Timero is a terminal-based workout assistant that helps you stay on track with y
 
 During a workout session, Timero guides you through each exercise in the correct order, automatically starting breaks and timers so you can focus on your workout — no need to count in your head. Whether you're training at home or in the gym, Timero ensures you complete your routine with precision and ease.
 
+## Table of Contents
+* [Timero](#timero)
+   * [Build With](#build-with)
+   * [Installation](#installation)
+   * [Usage](#usage)
+      * [Navigating the app](#navigating-the-app)
+      * [Exiting the app](#exiting-the-app)
+   * [Screenshots](#screenshots)
+      * [Routine Selection](#routine-selection)
+      * [Creating New Routine](#creating-new-routine)
+      * [Editing Exercise](#editing-exercise)
+      * [Workout Session](#workout-session)
+      * [Settings](#settings)
+   * [FAQ](#faq)
+
+<!-- Created by https://github.com/ekalinin/github-markdown-toc -->
+
 ## Build With
 
 - **Python** – The core programming language powering Timero.
