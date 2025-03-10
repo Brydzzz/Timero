@@ -30,7 +30,7 @@ class RepetitionExercise(Exercise):
 
 
 class Routine:
-    def __init__(self, name: str, exercises: Exercise = None):
+    def __init__(self, name: str, exercises: list[Exercise] = None):
         self.name = name
         self.exercises = exercises if exercises else []
 
