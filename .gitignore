@@ -3,4 +3,4 @@
 __pycache__/
 stopwatch.*
 config.json
-routine.json
+routines.json
