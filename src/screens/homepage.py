@@ -26,8 +26,11 @@ class Homepage(Screen):
         if button_id == "load-btn":
             self.action_load_routine()
         elif button_id == "create-btn":
-            pass
+            self.action_create_routine()
 
     def action_load_routine(self) -> None:
         self.app.routines = self.app.routine_controller.load_routines()
         self.app.screen_manager.go_to_routine_select()
+
+    def action_create_routine(self) -> None:
+        self.app.switch_screen("create-routine")
