@@ -122,18 +122,35 @@ class RoutineWidget(HorizontalGroup):
     exercise_to_edit_idx: int = reactive(None)
     exercise_to_edit_widget = reactive(None)
 
+    def _clear_exercise_form(self) -> None:
+        self.e_input.e_name.value = ""
+        self.e_input.duration_input.value = ""
+        self.e_input.rep_input.value = ""
+        self.e_input.e_type.value = DURATION_OPTION
+
+    def _fill_exercise_form_with_exercise_data(self, exercise) -> None:
+        if exercise.type == "duration":
+            self.e_input.e_name.value = exercise.name
+            self.e_input.duration_input.value = exercise.duration_mask_string()
+            self.e_input.rep_input.value = ""
+            self.e_input.e_type.value = DURATION_OPTION
+        elif exercise.type == "repetition":
+            self.e_input.e_name.value = exercise.name
+            self.e_input.duration_input.value = ""
+            self.e_input.rep_input.value = str(exercise.repetitions)
+            self.e_input.e_type.value = REPETITION_OPTION
+        else:
+            self.log("Exercise type unknown")
+
     def _show_exercise_form(
         self,
-        name: str = "",
-        duration: str = "",
-        rep: str = "",
-        type: int = DURATION_OPTION,
+        exercise=None,
         editing: bool = False,
     ) -> None:
-        self.e_input.e_name.value = name
-        self.e_input.duration_input.value = duration
-        self.e_input.rep_input.value = rep
-        self.e_input.e_type.value = type
+        if exercise:
+            self._fill_exercise_form_with_exercise_data(exercise)
+        else:
+            self._clear_exercise_form()
 
         if editing:
             self.e_input.add_class("editing-exercise")
@@ -192,7 +209,7 @@ class RoutineWidget(HorizontalGroup):
     def action_edit_exercise(self) -> None:
         selected_item = self.e_list.highlighted_child
 
-        if selected_item is None or not self.e_list.has_focus:
+        if not (selected_item and self.e_list.has_focus):
             self.app.notify(
                 message="Please select an exercise first.",
                 title="Cannot Edit Exercise",
@@ -204,21 +221,7 @@ class RoutineWidget(HorizontalGroup):
         self.exercise_to_edit = e
         self.exercise_to_edit_idx = self.e_list.index
         self.exercise_to_edit_widget = selected_item
-
-        if e.type == "duration":
-            self._show_exercise_form(
-                name=e.name,
-                duration=e.duration_mask_string(),
-                type=DURATION_OPTION,
-                editing=True,
-            )
-        elif e.type == "repetition":
-            self._show_exercise_form(
-                name=e.name,
-                rep=str(e.repetitions),
-                type=REPETITION_OPTION,
-                editing=True,
-            )
+        self._show_exercise_form(e, editing=True)
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         button_id = event.button.id
